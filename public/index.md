@@ -4,21 +4,15 @@
 
 你可以直接去系统里手动查询，不过或许有人会需要水电费数据用于一些别的用途也说不定……？比如邮件提醒什么的，总之这里有个 API 可以用啦！(　-\`ω-)✧
 
-因为做了内网穿透，所以这个接口即使是**在校园网以外**也能访问 (〃′▽`)
-
 > 在这里输入宿舍号（和充水电费时输入的一致，例如 T1 的 114 对应 `t10114`，T11 的 514 对应 `t110514`），看一看自己宿舍的水电费数据～
 >
 > <input id="room" type="text"><button id="query">查询</button>
 
-这个 API 是使用 PHP 编写的，运行在一个性能极差的<ruby>白色低级路由器<rt>土豆服务器</rt></ruby>上。因为它有时会出现一些奇怪的问题，它的可用性可能还不到一个⑨……
-
-**所以如果这个接口用不了，一定是因为路由器坏了，这个时候就耐心等原作者来修吧…φ(･ω･` )**
-
 # 使用方法
 
-`GET https://i.akarin.dev/IBSjnuweb/api/billing/{room}`
-`GET https://i.akarin.dev/IBSjnuweb/api/billing/{room}?text`
-`GET https://i.akarin.dev/IBSjnuweb/api/billing/{room}?html`
+`GET /IBSjnuweb/api/billing/{room}`
+`GET /IBSjnuweb/api/billing/{room}?text`
+`GET /IBSjnuweb/api/billing/{room}?html`
 
 接口默认返回 JSON 格式的数据，你也可以添加 URL 参数 `text` 或 `html`，分别可以获取纯文本（实际上是 Markdown）或 HTML 格式（仅添加了标签，并不是完整的网页）的查询结果。
 
@@ -59,6 +53,10 @@
 * 这个接口可以直接查询到**任何宿舍**的水电费数据，但是**水电费数据中并不会有任何涉及个人隐私的内容**。
 * 仅限个人使用，请勿用于公众号等商业用途。
 
-<p style="text-align:right"><small>Powered by Akarin ⁄(⁄⁄•⁄ω⁄•⁄⁄)⁄<br>这个人……正在等待一个可爱的她。</small></p>
+<p style="text-align:center">
+    <small>Powered by Akarin ⁄(⁄⁄•⁄ω⁄•⁄⁄)⁄</small>
+    <br>
+    <small><a href="https://github.com/TransparentLC/IBSjnuweb" target="_blank">Source code on GitHub</a></small>
+</p>
 
 <script>(()=>{const n=n=>document.getElementById(n),o=n("room");n("query").onclick=()=>o.value&&open(`api/billing/${o.value}?text`)})()</script>
