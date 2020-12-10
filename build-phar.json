@@ -1,0 +1,18 @@
+{
+    "name": "IBSjnuweb",
+    "entry": "main.php",
+    "include": [
+        "src",
+        "vendor"
+    ],
+    "exclude": {
+        "Package meta files": "/^vendor\\/.+\\/(license|readme|upgrading|changelog|authors?|backers?|\\.gitignore|\\.gitattributes|\\.hhconfig|\\.travis\\.yml|appveyor\\.yml|.*\\.md|.*\\.dist|makefile|composer\\.json|composer\\.lock|phpunit\\.xml|psalm\\.xml)$/i",
+        "Package test files": "/^vendor\\/.+\\/tests?\\/.*$/i"
+    },
+    "minify": {
+        "php": true,
+        "json": true
+    },
+    "compress": "gz",
+    "loader": "index.php"
+}
