@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace App;
 
 use \App\Util;
@@ -82,7 +84,7 @@ class BillingData {
         ];
     }
 
-    private function getFormatParamArray() {
+    private function getFormatParamArray(): array {
         $datetime = date('Y-m-d H:i:s');
         $fee = [
             'electricity' => round(
@@ -141,11 +143,11 @@ class BillingData {
         ];
     }
 
-    public function toArray() {
+    public function toArray(): array {
         return $this->data;
     }
 
-    public function toText() {
+    public function toText(): string {
         $formatParam = $this->getFormatParamArray();
         if (!empty($formatParam[2])) $formatParam[2] = " **{$formatParam[2]}**";
         $template = <<< 'AKARIN'
@@ -178,7 +180,7 @@ AKARIN;
         return sprintf($template, ...$formatParam);
     }
 
-    function toHtml() {
+    function toHtml(): string {
         $formatParam = $this->getFormatParamArray();
         if (!empty($formatParam[2])) $formatParam[2] = " <strong style=\"color:red\">{$formatParam[2]}</strong>";
         /*

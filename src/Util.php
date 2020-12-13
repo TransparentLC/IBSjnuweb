@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace App;
 
 use \GuzzleHttp\Client;
@@ -8,7 +10,7 @@ use \phpseclib\Crypt\AES;
 class Util {
     static ?AES $aes = null;
 
-    static function getIBSClient() {
+    static function getIBSClient(): Client {
         $client = new Client([
             'base_uri' => 'http://10.136.2.5/IBSjnuweb/WebService/JNUService.asmx/',
             'cookies' => new CookieJar,
@@ -21,7 +23,7 @@ class Util {
         return $client;
     }
 
-    static function generateIBSToken(string $userID) {
+    static function generateIBSToken(int $userID): string {
         $timestamp = time();
         $arr = [
             'userID' => $userID,
@@ -31,7 +33,7 @@ class Util {
         return (strlen($encrypted) > 64) ? join('%0A', str_split($encrypted, 64)) : ($encrypted . '%0A');
     }
 
-    static function getIBSRequestHeader(string $userID) {
+    static function getIBSRequestHeader(int $userID): array {
         return [
             'Token' => self::generateIBSToken($userID),
             'DateTime' => date('Y-m-d H:i:s', time()),

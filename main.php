@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 define('IS_PHAR', (bool)Phar::running());
 define('PHAR_PATH', IS_PHAR ? dirname(Phar::running(false)) : __DIR__);
 define('APP_PATH', IS_PHAR ? Phar::running() : __DIR__);
