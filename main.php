@@ -19,7 +19,9 @@ if (PHP_SAPI !== 'cli') {
 
     $dispatcher = \FastRoute\simpleDispatcher(function (\FastRoute\RouteCollector $r) {
         $r->addGroup('/api', function (\FastRoute\RouteCollector $r) {
+            $r->addRoute('GET', '/version', 'Version/index');
             $r->addRoute('GET', '/billing/{room}', 'Billing/index');
+            $r->addRoute('GET', '/record/{room}', 'Record/index');
         });
     });
 

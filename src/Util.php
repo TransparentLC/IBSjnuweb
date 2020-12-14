@@ -39,6 +39,24 @@ class Util {
             'DateTime' => date('Y-m-d H:i:s', time()),
         ];
     }
+
+    static function doIBSLogin(Client $client, string $user): int {
+        $loginResponse = json_decode(
+            $client->post('Login', [
+                'body' => json_encode([
+                    'user' => $user,
+                    'password' => base64_encode(static::$aes->encrypt($user)),
+                ], JSON_UNESCAPED_UNICODE_SLASHES),
+            ])->getBody()->getContents(),
+            true
+        );
+
+        if (!$loginResponse['d']['Success']) {
+            throw new \Exception('Invalid user');
+        }
+
+        return $loginResponse['d']['ResultList'][0]['customerId'];
+    }
 }
 
 Util::$aes = new AES(AES::MODE_CBC);

@@ -8,17 +8,24 @@
 >
 > <input id="room" type="text"><button id="query">查询</button>
 
-# 使用方法
+# 注意事项
+
+* 这个接口可以直接查询到**任何宿舍**的水电费数据，但是**水电费数据中并不会有任何涉及个人隐私的内容**。
+* 仅限个人使用，请勿用于公众号等商业用途。
+
+# API 文档
+
+* URL 中的 `{}` 部分表示参数，`[]` 部分是可选的。
+* 接口默认返回 JSON 格式的数据，部分接口也可以添加 URL 参数 `text` 或 `html`，分别可以获取纯文本（实际上是 Markdown）或 HTML 格式（仅添加了标签，并不是完整的网页）的查询结果。
+* 获取的数据仅供参考，可能与实际存在延迟或误差。
+
+## 查询余额
 
 `GET /IBSjnuweb/api/billing/{room}`
-`GET /IBSjnuweb/api/billing/{room}?text`
-`GET /IBSjnuweb/api/billing/{room}?html`
 
-接口默认返回 JSON 格式的数据，你也可以添加 URL 参数 `text` 或 `html`，分别可以获取纯文本（实际上是 Markdown）或 HTML 格式（仅添加了标签，并不是完整的网页）的查询结果。
-
-`room` 是宿舍号，数据仅供参考。
-
-返回的 JSON 数据的示例与说明：
+| 参数 | 类型 | 描述 |
+| - | - | - |
+| `room` | `String` | 宿舍号，不区分大小写，例如 `t10114` |
 
 ```json
 {
@@ -49,14 +56,44 @@
 }
 ```
 
-# 注意事项
-* 这个接口可以直接查询到**任何宿舍**的水电费数据，但是**水电费数据中并不会有任何涉及个人隐私的内容**。
-* 仅限个人使用，请勿用于公众号等商业用途。
+## 查询充值记录
+
+`GET /IBSjnuweb/api/record/{room}[?page={page}&count={count}]`
+
+| 参数 | 类型 | 描述 |
+| - | - | - |
+| `room` | `String` | 宿舍号，不区分大小写，例如 `t10114` |
+| `page` | `Number` | 页数，默认为 1 |
+| `count` | `Number` | 每页的记录数，默认为 10，不能超过 100 |
+
+```json
+{
+  "code": 200,
+  "msg": "T114514 查询成功",
+  "result": {
+    // 记录总数
+    "total": 23,
+    // 以当前设置的记录数计算的分页总数
+    "pageCount": 3,
+    "records": [
+      // 详细的充值记录
+      // time   时间戳
+      // event  充值说明
+      // amount 充值金额
+      { "time": 1606758115, "event": "补贴发放 (热水)", "amount": 200 },
+      { "time": 1606758115, "event": "补贴发放 (冷水)", "amount": 25.2 },
+      { "time": 1606758115, "event": "补贴发放 (电)", "amount": 20.0288 }
+    ]
+  }
+}
+```
 
 <p style="text-align:center">
     <small>Powered by Akarin ⁄(⁄⁄•⁄ω⁄•⁄⁄)⁄</small>
     <br>
+    <small>Commit: <span id="version"></span></small>
+    <br>
     <small><a href="https://github.com/TransparentLC/IBSjnuweb" target="_blank">Source code on GitHub</a></small>
 </p>
 
-<script>(()=>{const n=n=>document.getElementById(n),o=n("room");n("query").onclick=()=>o.value&&open(`api/billing/${o.value}?text`)})()</script>
+<script>(()=>{const n=n=>document.getElementById(n),o=n("room");n("query").onclick=()=>o.value&&open(`api/billing/${o.value}?text`),fetch('api/version').then(r=>r.json()).then(r=>n("version").innerText=r.result.commitShort)})()</script>
