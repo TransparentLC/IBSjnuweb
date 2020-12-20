@@ -57,6 +57,49 @@ class Util {
 
         return $loginResponse['d']['ResultList'][0]['customerId'];
     }
+
+    static function markdownTable(array $head, array $rows): string {
+        $_rows = [$head, ...$rows];
+        $rowLength = array_map(
+            fn ($e) => array_map(
+                fn ($t) => strlen(mb_convert_encoding($t, 'gbk', 'utf-8')),
+                $e
+            ),
+            $_rows
+        );
+        $rowMaxLength = array_map(
+            fn ($e) => max(
+                array_map(
+                    fn ($t) => $t[$e],
+                    $rowLength
+                )
+            ),
+            range(0, count($head) - 1)
+        );
+        for ($j = 0; $j < count($head); $j++) {
+            for ($i = 0; $i < count($_rows); $i++) {
+                $_rows[$i][$j] .= str_repeat(' ', $rowMaxLength[$j] - $rowLength[$i][$j]);
+            }
+        }
+        array_splice(
+            $_rows,
+            1,
+            0,
+            [
+                array_map(
+                    fn ($e) => str_repeat('-', $rowMaxLength[$e]),
+                    range(0, count($head) - 1)
+                )
+            ]
+        );
+        return join(
+            "\n",
+            array_map(
+                fn ($e) => '| ' . join(' | ', $e) . ' |',
+                $_rows
+            )
+        );
+    }
 }
 
 Util::$aes = new AES(AES::MODE_CBC);

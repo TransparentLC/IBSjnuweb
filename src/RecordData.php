@@ -70,47 +70,20 @@ class RecordData {
 
 AKARIN;
 
-        $rows = [
+        $table = Util::markdownTable(
             ['时间', '充值类型', '金额'],
-            ['', '', ''],
-            ...array_map(
+            array_map(
                 fn ($e) => [date('Y-m-d H:i:s', $e->time), $e->event, (string)$e->amount],
                 $this->records
-            ),
-        ];
-        $rowLength = array_map(
-            fn ($e) => array_map(
-                fn ($t) => strlen(mb_convert_encoding($t, 'gbk', 'utf-8')),
-                $e
-            ),
-            $rows
+            )
         );
-        $rowMaxLength = array_map(
-            fn ($e) => max(
-                array_map(
-                    fn ($t) => $t[$e],
-                    $rowLength
-                )
-            ),
-            range(0, 2)
-        );
-        foreach ($rows as $rowKey => &$rowValue) {
-            foreach ($rowMaxLength as $rowMaxLengthKey => $rowMaxLengthValue) {
-                $rowValue[$rowMaxLengthKey] .= str_repeat(' ', $rowMaxLengthValue - $rowLength[$rowKey][$rowMaxLengthKey]);
-            }
-        }
-        foreach ($rows[1] as &$r) {
-            $r = str_repeat('-', strlen($r));
-        }
-        foreach ($rows as &$row) {
-            $row = '| ' . join(' | ', $row) . ' |';
-        }
         return sprintf(
             $template,
             $this->room,
             $this->page,
             $this->pageCount,
-            join("\n", $rows),
+            $table,
+            // join("\n", $rows),
             date('Y-m-d H:i:s'),
         );
     }
