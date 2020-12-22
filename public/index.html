@@ -10,7 +10,7 @@
             box-sizing: border-box;
             min-width: 200px;
             max-width: 980px;
-            margin: 0 auto;
+            margin: 0 auto !important;
             padding: 45px
         }
 
@@ -20,48 +20,57 @@
             }
         }
     </style>
-    <title>JNU 番禺校区水电费查询 API by Akarin ⁄(⁄⁄•⁄ω⁄•⁄⁄)⁄</title>
 </head>
 
-<body>
-    <div class="markdown-body">
-        <h1 id="jnu-番禺校区水电费查询-api">JNU 番禺校区水电费查询 API</h1>
-        <p>大部分人可能都不知道，番禺校区的校园网里实际上有一个<a href="http://10.136.2.5/IBSjnuweb/">“宿舍能耗查询系统”</a>，可以用来查自己宿舍的水电费数据。如果你之前有看到过某个“暨”字头的<ruby>公众号<rt>营销号</rt></ruby>做了“查询水电费”的功能，其中的数据实际上就来自那个系统。</p>
-        <p>你可以直接去系统里手动查询，不过或许有人会需要水电费数据用于一些别的用途也说不定……？比如邮件提醒什么的，总之这里有个 API 可以用啦！(　-`ω-)✧</p>
-        <blockquote>
-            <p>在这里输入宿舍号（和充水电费时输入的一致，例如 T1 的 114 对应 <code>t10114</code>，T11 的 514 对应 <code>t110514</code>），看一看自己宿舍的水电费数据～</p>
-            <p><input id="room" type="text"><button id="query">查询</button></p>
-        </blockquote>
-        <h1 id="注意事项">注意事项</h1>
-        <ul>
-            <li>这个接口可以直接查询到<strong>任何宿舍</strong>的水电费数据，但是<strong>水电费数据中并不会有任何涉及个人隐私的内容</strong>。</li>
-            <li>仅限个人使用，请勿用于公众号等商业用途。</li>
-        </ul>
-        <h1 id="api-文档">API 文档</h1>
+<body class="markdown-body">
+    <h1 id="jnu-番禺校区水电费查询-api">JNU 番禺校区水电费查询 API</h1>
+    <p>大部分人可能都不知道，番禺校区的校园网里实际上有一个<a
+            href="http://10.136.2.5/IBSjnuweb/">“宿舍能耗查询系统”</a>，可以用来查自己宿舍的水电费数据。如果你之前有看到过某个“暨”字头的<ruby>公众号<rt>营销号</rt>
+            </ruby>做了“查询水电费”的功能，其中的数据实际上就来自那个系统。</p>
+    <p>你可以直接去系统里手动查询，不过或许有人会需要水电费数据用于一些别的用途也说不定……？比如邮件提醒什么的，总之这里有个 API 可以用啦！(　-`ω-)✧</p>
+    <blockquote>
+        <p>在这里输入宿舍号（和充水电费时输入的一致，例如 T1 的 114 对应 <code>t10114</code>，T11 的 514 对应 <code>t110514</code>），看一看自己宿舍的水电费数据～</p>
+        <p><input id="room" type="text"><button id="query">查询</button></p>
+    </blockquote>
+    <h1 id="注意事项">注意事项</h1>
+    <ul>
+        <li>这个接口可以直接查询到<strong>任何宿舍</strong>的水电费数据，但是<strong>水电费数据中并不会有任何涉及个人隐私的内容</strong>。</li>
+        <li>仅限个人使用，请勿用于公众号等商业用途。</li>
+    </ul>
+    <h1 id="api-文档">API 文档</h1>
+    <ul>
+        <li><a href="#%E6%B0%B4%E7%94%B5%E8%B4%B9%E4%BD%99%E9%A2%9D%E5%92%8C%E8%AF%BB%E6%95%B0">水电费余额和读数</a></li>
+        <li><a href="#%E5%85%85%E5%80%BC%E8%AE%B0%E5%BD%95">充值记录</a></li>
+        <li><a href="#%E8%80%97%E8%83%BD%E8%AE%B0%E5%BD%95">耗能记录</a></li>
+    </ul>
+    <blockquote>
+        <p>通用的说明：</p>
         <ul>
             <li>URL 中的 <code>{}</code> 部分表示参数，<code>[]</code> 部分是可选的。</li>
-            <li>接口默认返回 JSON 格式的数据，部分接口也可以添加 URL 参数 <code>text</code> 或 <code>html</code>，分别可以获取纯文本（实际上是 Markdown）或 HTML 格式（仅添加了标签，并不是完整的网页）的查询结果。</li>
+            <li>接口默认返回 JSON 格式的数据，部分接口也可以添加 URL 参数 <code>text</code> 或 <code>html</code>，分别可以获取纯文本（实际上是 Markdown）或 HTML
+                格式（仅添加了标签，并不是完整的网页）的查询结果。</li>
             <li>获取的数据仅供参考，可能与实际存在延迟或误差。</li>
         </ul>
-        <h2 id="查询余额">查询余额</h2>
-        <p><code>GET /IBSjnuweb/api/billing/{room}</code></p>
-        <table>
-            <thead>
-                <tr>
-                    <th>参数</th>
-                    <th>类型</th>
-                    <th>描述</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td><code>room</code></td>
-                    <td><code>String</code></td>
-                    <td>宿舍号，不区分大小写，例如 <code>t10114</code></td>
-                </tr>
-            </tbody>
-        </table>
-        <pre><code class="language-json"><span class="token punctuation">{</span>
+    </blockquote>
+    <h2 id="水电费余额和读数">水电费余额和读数</h2>
+    <p><code>GET /IBSjnuweb/api/billing/{room}</code></p>
+    <table>
+        <thead>
+            <tr>
+                <th>参数</th>
+                <th>类型</th>
+                <th>描述</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>room</code></td>
+                <td><code>String</code></td>
+                <td>宿舍号，不区分大小写，例如 <code>t10114</code></td>
+            </tr>
+        </tbody>
+    </table>
+    <pre><code class="language-json"><span class="token punctuation">{</span>
   <span class="token property">"code"</span><span class="token operator">:</span> <span class="token number">200</span><span class="token punctuation">,</span>
   <span class="token property">"msg"</span><span class="token operator">:</span> <span class="token string">"T114514 查询成功"</span><span class="token punctuation">,</span>
   <span class="token property">"result"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
@@ -87,35 +96,35 @@
     <span class="token punctuation">}</span>
   <span class="token punctuation">}</span>
 <span class="token punctuation">}</span></code></pre>
-        <h2 id="查询充值记录">查询充值记录</h2>
-        <p><code>GET /IBSjnuweb/api/record/{room}[?page={page}&amp;count={count}]</code></p>
-        <table>
-            <thead>
-                <tr>
-                    <th>参数</th>
-                    <th>类型</th>
-                    <th>描述</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td><code>room</code></td>
-                    <td><code>String</code></td>
-                    <td>宿舍号，不区分大小写，例如 <code>t10114</code></td>
-                </tr>
-                <tr>
-                    <td><code>page</code></td>
-                    <td><code>Number</code></td>
-                    <td>页数，默认为 1</td>
-                </tr>
-                <tr>
-                    <td><code>count</code></td>
-                    <td><code>Number</code></td>
-                    <td>每页的记录数，默认为 10，不能超过 100</td>
-                </tr>
-            </tbody>
-        </table>
-        <pre><code class="language-json"><span class="token punctuation">{</span>
+    <h2 id="充值记录">充值记录</h2>
+    <p><code>GET /IBSjnuweb/api/payment-record/{room}[?page={page}&amp;count={count}]</code></p>
+    <table>
+        <thead>
+            <tr>
+                <th>参数</th>
+                <th>类型</th>
+                <th>描述</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>room</code></td>
+                <td><code>String</code></td>
+                <td>宿舍号，不区分大小写，例如 <code>t10114</code></td>
+            </tr>
+            <tr>
+                <td><code>page</code></td>
+                <td><code>Number</code></td>
+                <td>页数，默认为 1</td>
+            </tr>
+            <tr>
+                <td><code>count</code></td>
+                <td><code>Number</code></td>
+                <td>每页的记录数，默认为 10，不能超过 100</td>
+            </tr>
+        </tbody>
+    </table>
+    <pre><code class="language-json"><span class="token punctuation">{</span>
   <span class="token property">"code"</span><span class="token operator">:</span> <span class="token number">200</span><span class="token punctuation">,</span>
   <span class="token property">"msg"</span><span class="token operator">:</span> <span class="token string">"T114514 查询成功"</span><span class="token punctuation">,</span>
   <span class="token property">"result"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
@@ -134,14 +143,57 @@
     <span class="token punctuation">]</span>
   <span class="token punctuation">}</span>
 <span class="token punctuation">}</span></code></pre>
-        <p style="text-align:center">
-            <small>Powered by Akarin ⁄(⁄⁄•⁄ω⁄•⁄⁄)⁄</small>
-            <br>
-            <small>Commit: <span id="version"></span></small>
-            <br>
-            <small><a href="https://github.com/TransparentLC/IBSjnuweb" target="_blank">Source code on GitHub</a></small>
-        </p>
-        <script>(()=>{const n=n=>document.getElementById(n),o=n("room");n("query").onclick=()=>o.value&&open(`api/billing/${o.value}?text`),fetch('api/version').then(r=>r.json()).then(r=>n("version").innerText=r.result.commitShort)})()</script>
-    </div>
+    <h2 id="耗能记录">耗能记录</h2>
+    <p><code>GET /IBSjnuweb/api/metrical-data/{room}/{date}</code></p>
+    <table>
+        <thead>
+            <tr>
+                <th>参数</th>
+                <th>类型</th>
+                <th>描述</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>room</code></td>
+                <td><code>String</code></td>
+                <td>宿舍号，不区分大小写，例如 <code>t10114</code></td>
+            </tr>
+            <tr>
+                <td><code>date</code></td>
+                <td><code>String</code></td>
+                <td>查询日期，可以使用 <code>2020</code> 或 <code>2020-09</code> 这两种格式，分别查询一整年 / 月的数据</td>
+            </tr>
+        </tbody>
+    </table>
+    <pre><code class="language-json"><span class="token punctuation">{</span>
+  <span class="token property">"code"</span><span class="token operator">:</span> <span class="token number">200</span><span class="token punctuation">,</span>
+  <span class="token property">"msg"</span><span class="token operator">:</span> <span class="token string">"T114514 查询成功"</span><span class="token punctuation">,</span>
+  <span class="token property">"result"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+    <span class="token comment">// time  时间戳，一般是一年中每个月的第一天（按年份查询）/一个月中每一天（按月份查询）的零点</span>
+    <span class="token comment">// usage 使用量</span>
+    <span class="token property">"electricity"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+      <span class="token punctuation">{</span> <span class="token property">"time"</span><span class="token operator">:</span> <span class="token number">1606752000</span><span class="token punctuation">,</span> <span class="token property">"usage"</span><span class="token operator">:</span> <span class="token number">3.24</span> <span class="token punctuation">}</span><span class="token punctuation">,</span>
+      <span class="token punctuation">{</span> <span class="token property">"time"</span><span class="token operator">:</span> <span class="token number">1606838400</span><span class="token punctuation">,</span> <span class="token property">"usage"</span><span class="token operator">:</span> <span class="token number">3.63</span> <span class="token punctuation">}</span>
+    <span class="token punctuation">]</span><span class="token punctuation">,</span>
+    <span class="token property">"coldWater"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+      <span class="token punctuation">{</span> <span class="token property">"time"</span><span class="token operator">:</span> <span class="token number">1606752000</span><span class="token punctuation">,</span> <span class="token property">"usage"</span><span class="token operator">:</span> <span class="token number">0</span> <span class="token punctuation">}</span><span class="token punctuation">,</span>
+      <span class="token punctuation">{</span> <span class="token property">"time"</span><span class="token operator">:</span> <span class="token number">1606838400</span><span class="token punctuation">,</span> <span class="token property">"usage"</span><span class="token operator">:</span> <span class="token number">0</span> <span class="token punctuation">}</span>
+    <span class="token punctuation">]</span><span class="token punctuation">,</span>
+    <span class="token property">"hotWater"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+      <span class="token punctuation">{</span> <span class="token property">"time"</span><span class="token operator">:</span> <span class="token number">1606752000</span><span class="token punctuation">,</span> <span class="token property">"usage"</span><span class="token operator">:</span> <span class="token number">0.2</span> <span class="token punctuation">}</span><span class="token punctuation">,</span>
+      <span class="token punctuation">{</span> <span class="token property">"time"</span><span class="token operator">:</span> <span class="token number">1606838400</span><span class="token punctuation">,</span> <span class="token property">"usage"</span><span class="token operator">:</span> <span class="token number">0.1</span> <span class="token punctuation">}</span>
+    <span class="token punctuation">]</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre>
+    <p style="text-align:center">
+        <small>Powered by Akarin ⁄(⁄⁄•⁄ω⁄•⁄⁄)⁄</small>
+        <br>
+        <small>Commit: <span id="version"></span></small>
+        <br>
+        <small><a href="https://github.com/TransparentLC/IBSjnuweb" target="_blank">Source code on GitHub</a></small>
+    </p>
+
+    <script>(()=>{const n=n=>document.getElementById(n),o=n("room");n("query").onclick=()=>o.value&&open(`api/billing/${o.value}?text`),fetch('api/version').then(r=>r.json()).then(r=>n("version").innerText=r.result.commitShort)})()</script>
 </body>
 </html>

@@ -83,7 +83,6 @@ AKARIN;
             $this->page,
             $this->pageCount,
             $table,
-            // join("\n", $rows),
             date('Y-m-d H:i:s'),
         );
     }
@@ -112,17 +111,21 @@ AKARIN;
                 <p>Powered by Akarin ⁄(⁄⁄•⁄ω⁄•⁄⁄)⁄</p>
             </blockquote>
         */
-        $template = '<h1>%s 水电费充值记录（第 %s/%s 页）</h1><table><thead><tr><th>时间</th><th>充值类型</th><th>金额</th></tr></thead><tbody>%s</tbody></table><blockquote><p>数据获取时间：%s</p><p>Powered by Akarin ⁄(⁄⁄•⁄ω⁄•⁄⁄)⁄</p></blockquote>';
+        $template = '<h1>%s 水电费充值记录（第 %s/%s 页）</h1>%s<blockquote><p>数据获取时间：%s</p><p>Powered by Akarin ⁄(⁄⁄•⁄ω⁄•⁄⁄)⁄</p></blockquote>';
         return sprintf(
             $template,
             $this->room,
             $this->page,
             $this->pageCount,
-            join(
-                '',
+            Util::htmlTable(
+                ['时间', '充值类型', '金额'],
                 array_map(
-                    fn ($e) => '<tr><td>' . date('Y-m-d H:i:s', $e->time) . '</td><td>' . $e->event . '</td><td>' . $e->amount . '</td></tr>',
-                    $this->records
+                    fn ($e) => [
+                        date('Y-m-d H:i:s', $e->time),
+                        $e->event,
+                        $e->amount,
+                    ],
+                    $this->records,
                 )
             ),
             date('Y-m-d H:i:s')

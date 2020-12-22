@@ -21,7 +21,8 @@ if (PHP_SAPI !== 'cli') {
         $r->addGroup('/api', function (\FastRoute\RouteCollector $r) {
             $r->addRoute('GET', '/version', 'Version/index');
             $r->addRoute('GET', '/billing/{room}', 'Billing/index');
-            $r->addRoute('GET', '/record/{room}', 'Record/index');
+            $r->addRoute('GET', '/payment-record/{room}', 'Record/index');
+            $r->addRoute('GET', '/metrical-data/{room}/{year:(?:19|20)\d{2}}[-{month:(?:0?[1-9]|1[012])}]', 'Metrical/index');
         });
     });
 

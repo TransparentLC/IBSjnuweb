@@ -100,6 +100,12 @@ class Util {
             )
         );
     }
+
+    static function htmlTable(array $head, array $rows): string {
+        $head = join('', array_map(fn ($e) => "<th>{$e}</th>", $head));
+        $rows = join('', array_map(fn ($e) => '<tr>' . join('', array_map(fn ($t) => "<td>{$t}</td>", $e)) . '</tr>', $rows));
+        return "<table><thead><tr>{$head}</tr></thead><tbody>{$rows}</tbody></table>";
+    }
 }
 
 Util::$aes = new AES(AES::MODE_CBC);
