@@ -189,11 +189,11 @@
     <p style="text-align:center">
         <small>Powered by Akarin ⁄(⁄⁄•⁄ω⁄•⁄⁄)⁄</small>
         <br>
-        <small>Commit: <span id="version"></span></small>
+        <small>Commit: <abbr id="version">...</abbr></small>
         <br>
         <small><a href="https://github.com/TransparentLC/IBSjnuweb" target="_blank">Source code on GitHub</a></small>
     </p>
 
-    <script>(()=>{const n=n=>document.getElementById(n),o=n("room");n("query").onclick=()=>o.value&&open(`api/billing/${o.value}?text`),fetch('api/version').then(r=>r.json()).then(r=>n("version").innerText=r.result.commitShort)})()</script>
+    <script>(()=>{const e=e=>document.getElementById(e),t=e=>`${e}`.padStart(2,0),n=e("room");e("query").onclick=()=>n.value&&open(`api/billing/${n.value}?text`),fetch("api/version").then((e=>e.json())).then((n=>{const r=n.result,o=new Date(1e3*r.commitTime),v=e("version");v.innerText=r.commitShort;v.title=`${r.commit} (${o.getFullYear()}-${t(o.getMonth()+1)}-${t(o.getDate())} ${t(o.getHours())}:${t(o.getMinutes())}:${t(o.getSeconds())})`}))})()</script>
 </body>
 </html>
