@@ -21,16 +21,26 @@
 
 > 通用的说明：
 > * URL 中的 `{}` 部分表示参数，`[]` 部分是可选的。
-> * 接口默认返回 JSON 格式的数据，部分接口也可以添加 URL 参数 `text` 或 `html`，分别可以获取纯文本（实际上是 Markdown）或 HTML 格式（仅添加了标签，并不是完整的网页）的查询结果。
 > * 获取的数据仅供参考，可能与实际存在延迟或误差。
+> * 一些 API 可以使用 URL 参数 `format` 指定返回数据的类型，参见下表：
+>
+> | 返回数据的类型 | 描述 |
+> | - | - |
+> | `json` | JSON 格式，默认值 |
+> | `markdown` | 格式化后的 Markdown 文本 |
+> | `text` | `markdown` 的别名 |
+> | `html` | 添加了 HTML 标签的格式，并不是完整的网页 |
+> | `chart` | 通过公共 API “[QuickChart](https://quickchart.io/)” 生成的图表 （使用了 302 重定向） |
+> | `graph` | `chart` 的别名 |
 
 ## 水电费余额和读数
 
-`GET /IBSjnuweb/api/billing/{room}`
+`GET /IBSjnuweb/api/billing/{room}[?format={format}]`
 
 | 参数 | 类型 | 描述 |
 | - | - | - |
 | `room` | `String` | 宿舍号，不区分大小写，例如 `t10114` |
+| `format` | `String` | 返回数据的类型，可选择 `json`、`markdown`、`html` |
 
 ```json
 {
@@ -63,13 +73,14 @@
 
 ## 充值记录
 
-`GET /IBSjnuweb/api/payment-record/{room}[?page={page}&count={count}]`
+`GET /IBSjnuweb/api/payment-record/{room}[?page={page}&count={count}&format={format}]`
 
 | 参数 | 类型 | 描述 |
 | - | - | - |
 | `room` | `String` | 宿舍号，不区分大小写，例如 `t10114` |
 | `page` | `Number` | 页数，默认为 1 |
 | `count` | `Number` | 每页的记录数，默认为 10，不能超过 100 |
+| `format` | `String` | 返回数据的类型，可选择 `json`、`markdown`、`html` |
 
 ```json
 {
@@ -95,12 +106,13 @@
 
 ## 耗能记录
 
-`GET /IBSjnuweb/api/metrical-data/{room}/{date}`
+`GET /IBSjnuweb/api/metrical-data/{room}/{date}[?format={format}]`
 
 | 参数 | 类型 | 描述 |
 | - | - | - |
 | `room` | `String` | 宿舍号，不区分大小写，例如 `t10114` |
 | `date` | `String` | 查询日期，可以使用 `2020` 或 `2020-09` 这两种格式，分别查询一整年 / 月的数据 |
+| `format` | `String` | 返回数据的类型，可选择 `json`、`markdown`、`html`、`chart` |
 
 ```json
 {
@@ -133,4 +145,4 @@
     <small><a href="https://github.com/TransparentLC/IBSjnuweb" target="_blank">Source code on GitHub</a></small>
 </p>
 
-<script>(()=>{const e=e=>document.getElementById(e),t=e=>`${e}`.padStart(2,0),n=e("room");e("query").onclick=()=>n.value&&open(`api/billing/${n.value}?text`),fetch("api/version").then((e=>e.json())).then((n=>{const r=n.result,o=new Date(1e3*r.commitTime),v=e("version");v.innerText=r.commitShort;v.title=`${r.commit} (${o.getFullYear()}-${t(o.getMonth()+1)}-${t(o.getDate())} ${t(o.getHours())}:${t(o.getMinutes())}:${t(o.getSeconds())})`}))})()</script>
+<script>(()=>{const e=e=>document.getElementById(e),t=e=>`${e}`.padStart(2,0),n=e("room");e("query").onclick=()=>n.value&&open(`api/billing/${n.value}?format=markdown`),fetch("api/version").then((e=>e.json())).then((n=>{const r=n.result,o=new Date(1e3*r.commitTime),v=e("version");v.innerText=r.commitShort;v.title=`${r.commit} (${o.getFullYear()}-${t(o.getMonth()+1)}-${t(o.getDate())} ${t(o.getHours())}:${t(o.getMinutes())}:${t(o.getSeconds())})`}))})()</script>

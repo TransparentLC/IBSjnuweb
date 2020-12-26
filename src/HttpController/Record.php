@@ -15,22 +15,39 @@ class Record extends \App\Component\HttpController {
                 empty($_GET['page']) ? 1 : (int)$_GET['page'],
                 empty($_GET['count']) ? 10 : (int)$_GET['count']
             );
-            if (isset($_GET['text'])) {
-                header('Content-Type:text/plain');
-                echo $record->toText();
-            } else if (isset($_GET['html'])) {
-                echo $record->toHtml();
-            } else {
-                $this->writeJson(200, $record->toArray(), "{$room} 查询成功");
+
+            switch ($_GET['format'] ?? null) {
+                case 'text':
+                case 'markdown':
+                    header('Content-Type:text/plain');
+                    echo $record->toText();
+                    break;
+
+                case 'html':
+                    echo $record->toHtml();
+                    break;
+
+                case 'json':
+                default:
+                    $this->writeJson(200, $record->toArray(), "{$room} 查询成功");
+                    break;
             }
         } catch (\Throwable $th) {
-            if (isset($_GET['text'])) {
-                header('Content-Type:text/plain');
-                echo "查询失败：{$th->getMessage()}";
-            } else if (isset($_GET['html'])) {
-                echo "<p>查询失败：{$th->getMessage()}</p>";
-            } else {
-                $this->writeJson(400, null, "查询失败：{$th->getMessage()}");
+            switch ($_GET['format'] ?? null) {
+                case 'text':
+                case 'markdown':
+                    header('Content-Type:text/plain');
+                    echo "查询失败：{$th->getMessage()}";
+                    break;
+
+                case 'html':
+                    echo "<p>查询失败：{$th->getMessage()}</p>";
+                    break;
+
+                case 'json':
+                default:
+                    $this->writeJson(400, null, "查询失败：{$th->getMessage()}");
+                    break;
             }
         }
     }

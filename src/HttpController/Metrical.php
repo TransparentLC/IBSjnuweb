@@ -58,10 +58,14 @@ class Metrical extends \App\Component\HttpController {
                 (string)$e['usage'],
             ];
             $func2 = fn ($acc, $cur) => $acc += $cur['usage'];
-            if (isset($_GET['text'])) {
-                header('Content-Type:text/plain');
-                $template = <<< 'AKARIN'
-%s 耗能记录
+
+            switch ($_GET['format'] ?? null) {
+                case 'text':
+                case 'markdown':
+                    header('Content-Type:text/plain');
+                    #region
+                    $template = <<< 'AKARIN'
+%s %s耗能记录
 ================================
 
 电能使用记录（度）：
@@ -81,84 +85,202 @@ class Metrical extends \App\Component\HttpController {
 > Powered by Akarin ⁄(⁄⁄•⁄ω⁄•⁄⁄)⁄
 
 AKARIN;
-                echo sprintf(
-                    $template,
-                    $room,
-                    Util::markdownTable(
-                        ['日期', '使用量'],
-                        [
-                            ...array_map($func1, $metricalData['electricity']),
-                            ['总计', (string)array_reduce($metricalData['electricity'], $func2, 0)],
-                        ]
-                    ),
-                    Util::markdownTable(
-                        ['日期', '使用量'],
-                        [
-                            ...array_map($func1, $metricalData['coldWater']),
-                            ['总计', (string)array_reduce($metricalData['coldWater'], $func2, 0)],
-                        ]
-                    ),
-                    Util::markdownTable(
-                        ['日期', '使用量'],
-                        [
-                            ...array_map($func1, $metricalData['hotWater']),
-                            ['总计', (string)array_reduce($metricalData['hotWater'], $func2, 0)],
-                        ]
-                    ),
-                    date('Y-m-d H:i:s')
-                );
-            } else if (isset($_GET['html'])) {
-                /*
-                    <h1>%s 耗能记录</h1>
-                    <p>电能使用记录（度）：</p>
-                    <table>...</table>
-                    <p>冷水使用记录（吨）：</p>
-                    <table>...</table>
-                    <p>热水使用记录（吨）：</p>
-                    <table>...</table>
-                    <blockquote>
-                        <p>数据获取时间：%s</p>
-                        <p>Powered by Akarin ⁄(⁄⁄•⁄ω⁄•⁄⁄)⁄</p>
-                    </blockquote>
-                */
-                $template = '<h1>%s 耗能记录</h1><p>电能使用记录（度）：</p>%s<p>冷水使用记录（吨）：</p>%s<p>热水使用记录（吨）：</p>%s<blockquote><p>数据获取时间：%s</p><p>Powered by Akarin ⁄(⁄⁄•⁄ω⁄•⁄⁄)⁄</p></blockquote>';
-                echo sprintf(
-                    $template,
-                    $room,
-                    Util::htmlTable(
-                        ['日期', '使用量'],
-                        [
-                            ...array_map($func1, $metricalData['electricity']),
-                            ['总计', (string)array_reduce($metricalData['electricity'], $func2, 0)],
-                        ]
-                    ),
-                    Util::htmlTable(
-                        ['日期', '使用量'],
-                        [
-                            ...array_map($func1, $metricalData['coldWater']),
-                            ['总计', (string)array_reduce($metricalData['coldWater'], $func2, 0)],
-                        ]
-                    ),
-                    Util::htmlTable(
-                        ['日期', '使用量'],
-                        [
-                            ...array_map($func1, $metricalData['hotWater']),
-                            ['总计', (string)array_reduce($metricalData['hotWater'], $func2, 0)],
-                        ]
-                    ),
-                    date('Y-m-d H:i:s')
-                );
-            } else {
-                $this->writeJson(200, $metricalData, "{$room} 查询成功");
+                    #endregion
+                    echo sprintf(
+                        $template,
+                        $room,
+                        $month ? "{$year} 年 {$month} 月" : "{$year} 年",
+                        Util::markdownTable(
+                            ['日期', '使用量'],
+                            [
+                                ...array_map($func1, $metricalData['electricity']),
+                                ['总计', (string)array_reduce($metricalData['electricity'], $func2, 0)],
+                            ]
+                        ),
+                        Util::markdownTable(
+                            ['日期', '使用量'],
+                            [
+                                ...array_map($func1, $metricalData['coldWater']),
+                                ['总计', (string)array_reduce($metricalData['coldWater'], $func2, 0)],
+                            ]
+                        ),
+                        Util::markdownTable(
+                            ['日期', '使用量'],
+                            [
+                                ...array_map($func1, $metricalData['hotWater']),
+                                ['总计', (string)array_reduce($metricalData['hotWater'], $func2, 0)],
+                            ]
+                        ),
+                        date('Y-m-d H:i:s')
+                    );
+                    break;
+
+                case 'html':
+                    /*
+                        <h1>%s %s耗能记录</h1>
+                        <p>电能使用记录（度）：</p>
+                        <table>...</table>
+                        <p>冷水使用记录（吨）：</p>
+                        <table>...</table>
+                        <p>热水使用记录（吨）：</p>
+                        <table>...</table>
+                        <blockquote>
+                            <p>数据获取时间：%s</p>
+                            <p>Powered by Akarin ⁄(⁄⁄•⁄ω⁄•⁄⁄)⁄</p>
+                        </blockquote>
+                    */
+                    $template = '<h1>%s %s耗能记录</h1><p>电能使用记录（度）：</p>%s<p>冷水使用记录（吨）：</p>%s<p>热水使用记录（吨）：</p>%s<blockquote><p>数据获取时间：%s</p><p>Powered by Akarin ⁄(⁄⁄•⁄ω⁄•⁄⁄)⁄</p></blockquote>';
+                    echo sprintf(
+                        $template,
+                        $room,
+                        $month ? "{$year} 年 {$month} 月" : "{$year} 年",
+                        Util::htmlTable(
+                            ['日期', '使用量'],
+                            [
+                                ...array_map($func1, $metricalData['electricity']),
+                                ['总计', (string)array_reduce($metricalData['electricity'], $func2, 0)],
+                            ]
+                        ),
+                        Util::htmlTable(
+                            ['日期', '使用量'],
+                            [
+                                ...array_map($func1, $metricalData['coldWater']),
+                                ['总计', (string)array_reduce($metricalData['coldWater'], $func2, 0)],
+                            ]
+                        ),
+                        Util::htmlTable(
+                            ['日期', '使用量'],
+                            [
+                                ...array_map($func1, $metricalData['hotWater']),
+                                ['总计', (string)array_reduce($metricalData['hotWater'], $func2, 0)],
+                            ]
+                        ),
+                        date('Y-m-d H:i:s')
+                    );
+                    break;
+
+                case 'chart':
+                case 'graph':
+                    $func3 = fn ($e) => [
+                        'x' => date($month ? 'Y-m-d' : 'Y-m', $e['time']),
+                        'y' => $e['usage'],
+                    ];
+                    header('Location:https://quickchart.io/chart?' . http_build_query([
+                        'w' => $month ? 1440 : 1080,
+                        'h' => 480,
+                        'f' => (strpos($_SERVER['HTTP_ACCEPT'], 'image/webp') !== false) ? 'webp' : 'png',
+                        'c' => json_encode([
+                            'type' => 'line',
+                            'options' => [
+                                'title' => [
+                                    'display' => true,
+                                    'text' => sprintf(
+                                        '%s %s耗能记录',
+                                        $room,
+                                        $month ? "{$year} 年 {$month} 月" : "{$year} 年"
+                                    ),
+                                ],
+                                'scales' => [
+                                    'xAxes' => [
+                                        [
+                                            'offset' => true,
+                                            'type' => 'time',
+                                            'time' => [
+                                                'displayFormats' => [
+                                                    'day' => 'YYYY-MM-DD',
+                                                    'month' => 'YYYY-MM',
+                                                ],
+                                                'unit' => $month ? 'day' : 'month'
+                                            ],
+                                        ],
+                                    ],
+                                    'yAxes' => [
+                                        [
+                                            'id' => 0,
+                                            'position' => 'left',
+                                            'scaleLabel' => [
+                                                'display' => true,
+                                                'labelString' => '电能（度）'
+                                            ],
+                                            'ticks' => [
+                                                'min' => 0,
+                                            ],
+                                        ],
+                                        [
+                                            'id' => 1,
+                                            'position' => 'right',
+                                            'scaleLabel' => [
+                                                'display' => true,
+                                                'labelString' => '用水量（吨）'
+                                            ],
+                                            'ticks' => [
+                                                'min' => 0,
+                                            ],
+                                        ],
+                                    ],
+                                ],
+                            ],
+                            'data' => [
+                                'datasets' => [
+                                    [
+                                        'yAxisID' => 0,
+                                        'label' => '电能',
+                                        'data' => array_map($func3, $metricalData['electricity']),
+                                        'fill' => false,
+                                        'cubicInterpolationMode' => 'monotone',
+                                        'lineTension' => .5,
+                                        'borderColor' => '#4bc0c0',
+                                        'pointBackgroundColor' => '#4bc0c0',
+                                    ],
+                                    [
+                                        'yAxisID' => 1,
+                                        'label' => '冷水',
+                                        'data' => array_map($func3, $metricalData['coldWater']),
+                                        'fill' => false,
+                                        'cubicInterpolationMode' => 'monotone',
+                                        'lineTension' => .5,
+                                        'borderColor' => '#36a2eb',
+                                        'pointBackgroundColor' => '#36a2eb',
+                                    ],
+                                    [
+                                        'yAxisID' => 1,
+                                        'label' => '热水',
+                                        'data' => array_map($func3, $metricalData['hotWater']),
+                                        'fill' => false,
+                                        'cubicInterpolationMode' => 'monotone',
+                                        'lineTension' => .5,
+                                        'borderColor' => '#ff6384',
+                                        'pointBackgroundColor' => '#ff6384',
+                                    ],
+                                ],
+                            ],
+                        ], JSON_UNESCAPED_UNICODE_SLASHES),
+                    ]), true, 302);
+                    break;
+
+                case 'json':
+                default:
+                    $this->writeJson(200, $metricalData, "{$room} 查询成功");
+                    break;
             }
         } catch (\Throwable $th) {
-            if (isset($_GET['text'])) {
-                header('Content-Type:text/plain');
-                echo "查询失败：{$th->getMessage()}";
-            } else if (isset($_GET['html'])) {
-                echo "<p>查询失败：{$th->getMessage()}</p>";
-            } else {
-                $this->writeJson(400, null, "查询失败：{$th->getMessage()}");
+            switch ($_GET['format'] ?? null) {
+                case 'text':
+                case 'markdown':
+                case 'chart':
+                case 'graph':
+                    header('Content-Type:text/plain');
+                    echo "查询失败：{$th->getMessage()}";
+                    break;
+
+                case 'html':
+                    echo "<p>查询失败：{$th->getMessage()}</p>";
+                    break;
+
+                case 'json':
+                default:
+                    $this->writeJson(400, null, "查询失败：{$th->getMessage()}");
+                    break;
             }
         }
     }

@@ -21,7 +21,7 @@
 1. 配置好 PHP 和 Nginx 环境
 2. 下载源代码到网站目录，这里假设源代码保存在 `IBSjnuweb-source` 文件夹
 3. 在终端中执行 `composer install` 安装依赖
-4. 假设需要将 API 部署在 `http://example.com/IBSjnuweb/`，添加以下 Nginx 配置：
+4. 假设需要将 API 部署在 `http://example.com/IBSjnuweb/`，可以参考以下 Nginx 配置：
 
 ```nginx
 location = /IBSjnuweb-source {
@@ -38,6 +38,10 @@ location ~ \/IBSjnuweb\/(.*)$ {
 }
 ```
 
+> 也可以使用[这个脚本](https://gist.github.com/TransparentLC/c3044ae50140d3e57b654bfe486bb14a)将源代码打包为 PHAR 包后，将生成的 `IBSjnuweb.phar` 和 `index.php` 放在同一目录。此时需要将上述配置的 `main.php` 改为 `index.php`。
+>
+> 打包命令：`php phar-builder.php IBSjnuweb/build-phar.json`
+
 你可以通过编辑 `public/index.html` 来修改主页上的说明。
 
 如果你有云服务器资源，可以在云服务器和部署的设备上配置 [frp](https://github.com/fatedier/frp) 等内网穿透工具，这样在校园网以外也可以查询水电费了。
@@ -47,4 +51,3 @@ location ~ \/IBSjnuweb\/(.*)$ {
 在终端中执行 `php -S 0.0.0.0:5000 main.php`，API 就会运行在本机的 5000 端口（也可以修改为其它端口）。
 
 Windows 用户可以直接双击 `run-dev-server.bat`。
-

@@ -11,22 +11,40 @@ class Billing extends \App\Component\HttpController {
 
         try {
             $billing = new BillingData($room);
-            if (isset($_GET['text'])) {
-                header('Content-Type:text/plain');
-                echo $billing->toText();
-            } else if (isset($_GET['html'])) {
-                echo $billing->toHtml();
-            } else {
-                $this->writeJson(200, $billing->toArray(), "{$room} 查询成功");
+
+            switch ($_GET['format'] ?? null) {
+                case 'text':
+                case 'markdown':
+                    header('Content-Type:text/plain');
+                    echo $billing->toText();
+                    break;
+
+                case 'html':
+                    echo $billing->toHtml();
+                    break;
+
+                case 'json':
+                default:
+                    $this->writeJson(200, $billing->toArray(), "{$room} 查询成功");
+                    break;
             }
         } catch (\Throwable $th) {
-            if (isset($_GET['text'])) {
-                header('Content-Type:text/plain');
-                echo "查询失败：{$th->getMessage()}";
-            } else if (isset($_GET['html'])) {
-                echo "<p>查询失败：{$th->getMessage()}</p>";
-            } else {
-                $this->writeJson(400, null, "查询失败：{$th->getMessage()}");
+            switch ($_GET['format'] ?? null) {
+                case 'text':
+                case 'markdown':
+                case 'chart':
+                    header('Content-Type:text/plain');
+                    echo "查询失败：{$th->getMessage()}";
+                    break;
+
+                case 'html':
+                    echo "<p>查询失败：{$th->getMessage()}</p>";
+                    break;
+
+                case 'json':
+                default:
+                    $this->writeJson(400, null, "查询失败：{$th->getMessage()}");
+                    break;
             }
         }
     }
