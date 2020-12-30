@@ -26,7 +26,7 @@ fetch('api/version')
         const result = res.result;
         if (result.commit && result.commitShort && result.commitTime) {
             const commitTime = new Date(1000 * result.commitTime);
-            $version.parentElement.style.cssText = $version.parentElement.nextElementSibling.cssText = '';
+            $version.parentElement.style.cssText = $version.parentElement.nextElementSibling.style.cssText = '';
             $version.innerText = result.commitShort;
             $version.title = `${result.commit} (${commitTime.getFullYear()}-${padStart20(commitTime.getMonth() + 1)}-${padStart20(commitTime.getDate())} ${padStart20(commitTime.getHours())}:${padStart20(commitTime.getMinutes())}:${padStart20(commitTime.getSeconds())})`;
         }
