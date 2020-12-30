@@ -4,9 +4,26 @@
 
 你可以直接去系统里手动查询，不过或许有人会需要水电费数据用于一些别的用途也说不定……？比如邮件提醒什么的，总之这里有个 API 可以用啦！(　-\`ω-)✧
 
-> 在这里输入宿舍号（和充水电费时输入的一致，例如 T1 的 114 对应 `t10114`，T11 的 514 对应 `t110514`），看一看自己宿舍的水电费数据～
+> 你也可以在这里直接查询自己宿舍的水电费数据～
 >
-> <input id="room" type="text"><button id="query">查询</button>
+> <div>
+>   宿舍号
+>   <input id="room" type="text" placeholder="示例：t10114">
+> </div>
+> <div>
+>   查询内容
+>   <select id="type">
+>     <option value="0">水电费余额和读数</option>
+>     <option value="1">最近的充值记录</option>
+>     <option value="2">当前月份的耗能记录</option>
+>     <option value="3">当前年份的耗能记录</option>
+>     <option value="4">当前月份的耗能记录（图表）</option>
+>     <option value="5">当前年份的耗能记录（图表）</option>
+>   </select>
+> </div>
+> <div>
+>   点击这里查看结果 -> <a id="api-url" target="_blank" rel="noopener noreferrer"></a>
+> </div>
 
 # 注意事项
 
@@ -140,9 +157,9 @@
 <p style="text-align:center">
     <small>Powered by Akarin ⁄(⁄⁄•⁄ω⁄•⁄⁄)⁄</small>
     <br>
-    <small>Commit: <abbr id="version">...</abbr></small>
-    <br>
+    <small style="display:none">Commit: <abbr id="version">...</abbr></small>
+    <br style="display:none">
     <small><a href="https://github.com/TransparentLC/IBSjnuweb" target="_blank">Source code on GitHub</a></small>
 </p>
 
-<script>(()=>{const e=e=>document.getElementById(e),t=e=>`${e}`.padStart(2,0),n=e("room");e("query").onclick=()=>n.value&&open(`api/billing/${n.value}?format=markdown`),fetch("api/version").then((e=>e.json())).then((n=>{const r=n.result,o=new Date(1e3*r.commitTime),v=e("version");v.innerText=r.commitShort;v.title=`${r.commit} (${o.getFullYear()}-${t(o.getMonth()+1)}-${t(o.getDate())} ${t(o.getHours())}:${t(o.getMinutes())}:${t(o.getSeconds())})`}))})()</script>
+<script src="app.js"></script>
