@@ -2,6 +2,8 @@
 
 # JNU 番禺校区水电费查询 API
 
+![](https://github.com/TransparentLC/IBSjnuweb/workflows/build-phar/badge.svg)
+
 </div>
 
 <div align="center">
@@ -19,9 +21,8 @@
 **部署的设备必须可以正常连接番禺校区的校园网，否则无法使用 API。**
 
 1. 配置好 PHP 和 Nginx 环境
-2. 下载源代码到网站目录，这里假设源代码保存在 `IBSjnuweb-source` 文件夹
-3. 在终端中执行 `composer install` 安装依赖
-4. 假设需要将 API 部署在 `http://example.com/IBSjnuweb/`，可以参考以下 Nginx 配置：
+2. 从[这里](https://nightly.link/TransparentLC/IBSjnuweb/workflows/build-phar/master/IBSjnuweb)下载打包好的 PHAR 文件和其他静态文件到网站目录，这里假设解压后保存在 `IBSjnuweb-source` 文件夹
+3. 假设需要将 API 部署在 `https://example.com/IBSjnuweb/`，添加以下 Nginx 配置：
 
 ```nginx
 location = /IBSjnuweb-source {
@@ -34,13 +35,9 @@ location ~ \/IBSjnuweb\/(.*)$ {
     try_files
         /IBSjnuweb-source/public/$1
         /IBSjnuweb-source/public/$1/
-        /IBSjnuweb-source/main.php?/$1?$query_string;
+        /IBSjnuweb-source/index.php?/$1?$query_string;
 }
 ```
-
-> 也可以使用[这个脚本](https://gist.github.com/TransparentLC/c3044ae50140d3e57b654bfe486bb14a)将源代码打包为 PHAR 包后，将生成的 `IBSjnuweb.phar` 和 `index.php` 放在同一目录。此时需要将上述配置的 `main.php` 改为 `index.php`。
->
-> 打包命令：`php phar-builder.php IBSjnuweb/build-phar.json`
 
 你可以通过编辑 `public/index.html` 来修改主页上的说明。
 
@@ -48,6 +45,6 @@ location ~ \/IBSjnuweb\/(.*)$ {
 
 # 使用 PHP 内置的 Web 服务器运行（开发用）
 
-在终端中执行 `php -S 0.0.0.0:5000 main.php`，API 就会运行在本机的 5000 端口（也可以修改为其它端口）。
+下载源代码后，在终端中执行 `php -S 0.0.0.0:5000 main.php`，API 就会运行在本机的 5000 端口（也可以修改为其它端口）。
 
 Windows 用户可以直接双击 `run-dev-server.bat`。
