@@ -35,5 +35,9 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: IBSjnuweb
-          path: IBSjnuweb.phar
+          path: |
+            IBSjnuweb.phar
+            index.php
+            public/app.js
+            public/index.html
         if: ${{ always() }}
