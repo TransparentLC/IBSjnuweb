@@ -14,7 +14,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: 8.0
-          ini-values: opcache.enable_cli=1, opcache.jit=tracing, opcache.jit_buffer_size=64M
+          ini-values: opcache.enable_cli=1, opcache.jit=tracing, opcache.jit_buffer_size=64M, phar.readonly=0
           tools: composer:v2
           coverage: none
       - name: Get Composer Cache Directory
@@ -29,7 +29,7 @@ jobs:
         run: composer install --ignore-platform-reqs
       - name: Build phar archive
         run: |
-          curl -L https://git.io/JtDYf > phar-builder.php
+          wget https://git.io/JtDYf -O phar-builder.php
           php phar-builder.php build-phar.json
       - name: Upload result
         uses: actions/upload-artifact@v2
