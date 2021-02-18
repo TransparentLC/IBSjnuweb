@@ -6,8 +6,9 @@
         "vendor"
     ],
     "exclude": {
-        "Package meta files": "/^vendor\\/.+\\/(license|readme|upgrading|changelog|authors?|backers?|\\.gitignore|\\.gitattributes|\\.hhconfig|\\.travis\\.yml|appveyor\\.yml|.*\\.md|.*\\.dist|makefile|composer\\.json|composer\\.lock|phpunit\\.xml|psalm\\.xml)$/i",
-        "Package test files": "/^vendor\\/.+\\/tests?\\/.*$/i"
+        "Package meta files": "/^vendor\\/.+\\/(license|readme|copyright|upgrading|changelog|authors?|backers?|\\.gitignore|\\.gitattributes|\\.hhconfig|\\.travis\\.yml|\\.pullapprove\\.yml|appveyor\\.yml|.*\\.md|.*\\.dist|makefile|composer\\.json|composer\\.lock|phpunit\\.xml|psalm\\.xml)$/i",
+        "Package test files": "/^vendor\\/.+\\/tests?\\/.*$/i",
+        "GitHub files": "/^vendor\\/\\.github\\/.*$/i"
     },
     "minify": {
         "php": true,

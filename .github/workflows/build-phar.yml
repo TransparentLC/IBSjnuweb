@@ -1,0 +1,36 @@
+name: build-phar
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build-phar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.0
+          ini-values: opcache.enable_cli=1, opcache.jit=tracing, opcache.jit_buffer_size=64M
+          tools: composer:v2
+          coverage: none
+      - name: Cache composer dependencies
+        uses: actions/cache@v2
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
+      - name: Install composer dependencies
+        run: composer install --ignore-platform-reqs
+      - name: Build phar archive
+        run: |
+          curl -L https://git.io/JtDYf > phar-builder.php
+          php phar-builder.php build-phar.json
+      - name: Upload result
+        uses: actions/upload-artifact@v2
+        with:
+          name: IBSjnuweb
+          path: IBSjnuweb.phar
+        if: ${{ always() }}
