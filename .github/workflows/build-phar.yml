@@ -35,13 +35,13 @@ jobs:
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
       - name: Install dependencies
         run: |
-          composer install --ignore-platform-reqs
+          composer install --ignore-platform-reqs --optimize-autoloader
           npm install -g html-minifier terser
       - name: Build phar archive
         run: |
           wget https://git.io/JtDYf -O phar-builder.php
           php phar-builder.php build-phar.json
-          html-minifier --collapse-whitespace --collapse-boolean-attributes --decode-entities --remove-comments --remove-redundant-attributes --remove-script-type-attributes --remove-style-link-type-attributes --remove-tag-whitespace --remove-empty-attributes --use-short-doctype --process-conditional-comments --sort-attributes --sort-class-name --minify-css true --minify-js true --putput public/index.html public/index.html
+          html-minifier --collapse-whitespace --collapse-boolean-attributes --decode-entities --remove-comments --remove-redundant-attributes --remove-script-type-attributes --remove-style-link-type-attributes --remove-tag-whitespace --remove-empty-attributes --use-short-doctype --process-conditional-comments --sort-attributes --sort-class-name --minify-css true --minify-js true --output public/index.html public/index.html
           terser --ecma 2020 --compress unsafe_math,unsafe_methods,unsafe_proto,unsafe_regexp,unsafe_undefined --mangle --comments false --output public/app.js public/app.js
       - name: Upload result
         uses: actions/upload-artifact@v2
