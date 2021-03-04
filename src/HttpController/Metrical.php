@@ -46,9 +46,9 @@ class Metrical extends \App\Component\HttpController {
                 'usage' => $e['dataValue'],
             ];
             $metricalData = [
-                'electricity' => array_map($func0, $response['d']['ResultList'][0]['datas']),
-                'coldWater' => array_map($func0, $response['d']['ResultList'][1]['datas']),
-                'hotWater' => array_map($func0, $response['d']['ResultList'][2]['datas']),
+                'electricity' => array_map($func0, Util::arraySearch($response['d']['ResultList'], fn ($e) => $e['energyType'] === 2)['datas']),
+                'coldWater' => array_map($func0, Util::arraySearch($response['d']['ResultList'], fn ($e) => $e['energyType'] === 3)['datas']),
+                'hotWater' => array_map($func0, Util::arraySearch($response['d']['ResultList'], fn ($e) => $e['energyType'] === 4)['datas']),
             ];
             foreach ($metricalData as &$md) {
                 usort($md, fn ($a, $b) => $a['time'] <=> $b['time']);

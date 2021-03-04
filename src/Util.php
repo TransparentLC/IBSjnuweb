@@ -8,7 +8,7 @@ use \GuzzleHttp\Cookie\CookieJar;
 use \phpseclib\Crypt\AES;
 
 class Util {
-    static ?AES $aes = null;
+    static AES $aes;
 
     static function getIBSClient(): Client {
         $client = new Client([
@@ -105,6 +105,15 @@ class Util {
         $head = join('', array_map(fn ($e) => "<th>{$e}</th>", $head));
         $rows = join('', array_map(fn ($e) => '<tr>' . join('', array_map(fn ($t) => "<td>{$t}</td>", $e)) . '</tr>', $rows));
         return "<table><thead><tr>{$head}</tr></thead><tbody>{$rows}</tbody></table>";
+    }
+
+    static function arraySearch(array $arr, callable $func) {
+        foreach ($arr as $key => $value) {
+            if ($func($value, $key)) {
+                return $value;
+            }
+        }
+        return null;
     }
 }
 
