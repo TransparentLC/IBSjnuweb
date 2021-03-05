@@ -36,11 +36,13 @@ class Record extends \App\Component\HttpController {
             switch ($_GET['format'] ?? null) {
                 case 'text':
                 case 'markdown':
+                    http_response_code(400);
                     header('Content-Type:text/plain');
                     echo "查询失败：{$th->getMessage()}";
                     break;
 
                 case 'html':
+                    http_response_code(400);
                     echo "<p>查询失败：{$th->getMessage()}</p>";
                     break;
 

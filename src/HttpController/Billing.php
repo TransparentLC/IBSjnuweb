@@ -33,11 +33,13 @@ class Billing extends \App\Component\HttpController {
                 case 'text':
                 case 'markdown':
                 case 'chart':
+                    http_response_code(400);
                     header('Content-Type:text/plain');
                     echo "查询失败：{$th->getMessage()}";
                     break;
 
                 case 'html':
+                    http_response_code(400);
                     echo "<p>查询失败：{$th->getMessage()}</p>";
                     break;
 
