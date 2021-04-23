@@ -45,11 +45,16 @@ class Metrical extends \App\Component\HttpController {
                 'time' => (int)($e['recordTime'] / 1000),
                 'usage' => $e['dataValue'],
             ];
-            $metricalData = [
-                'electricity' => array_map($func0, Util::arraySearch($response['d']['ResultList'], fn ($e) => $e['energyType'] === 2)['datas']),
-                'coldWater' => array_map($func0, Util::arraySearch($response['d']['ResultList'], fn ($e) => $e['energyType'] === 3)['datas']),
-                'hotWater' => array_map($func0, Util::arraySearch($response['d']['ResultList'], fn ($e) => $e['energyType'] === 4)['datas']),
-            ];
+            $metricalData = [];
+            foreach ([
+                [2, 'electricity'],
+                [3, 'coldWater'],
+                [4, 'hotWater'],
+            ] as $item) {
+                list($index, $key) = $item;
+                $data = Util::arraySearch($response['d']['ResultList'], fn ($e) => $e['energyType'] === $index);
+                $metricalData[$key] = $data ? array_map($func0, $data['datas']) : [];
+            }
             foreach ($metricalData as &$md) {
                 usort($md, fn ($a, $b) => $a['time'] <=> $b['time']);
             }

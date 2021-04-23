@@ -39,43 +39,53 @@ class BillingData {
         $allowanceElectricity = Util::arraySearch($response['allowance']['d']['ResultList'], fn ($e) => $e['itemType'] === 2);
         $allowanceColdWater = Util::arraySearch($response['allowance']['d']['ResultList'], fn ($e) => $e['itemType'] === 3);
         $allowanceHotWater = Util::arraySearch($response['allowance']['d']['ResultList'], fn ($e) => $e['itemType'] === 4);
+        $emptyAllowanceData = [
+            'total' => null,
+            'available' => null,
+        ];
         $this->data['allowance'] = [
-            'electricity' => [
+            'electricity' => $allowanceElectricity ? [
                 'total' => $allowanceElectricity['totalValue'],
                 'available' => $allowanceElectricity['avalibleValue'],
-            ],
-            'coldWater' => [
+            ] : $emptyAllowanceData,
+            'coldWater' => $allowanceColdWater ? [
                 'total' => $allowanceColdWater['totalValue'],
                 'available' => $allowanceColdWater['avalibleValue'],
-            ],
-            'hotWater' => [
+            ] : $emptyAllowanceData,
+            'hotWater' => $allowanceHotWater ? [
                 'total' => $allowanceHotWater['totalValue'],
                 'available' => $allowanceHotWater['avalibleValue'],
-            ],
+            ] : $emptyAllowanceData,
         ];
 
         $billElectricity = Util::arraySearch($response['bill']['d']['ResultList'], fn ($e) => $e['energyType'] === 2);
         $billColdWater = Util::arraySearch($response['bill']['d']['ResultList'], fn ($e) => $e['energyType'] === 3);
         $billHotWater = Util::arraySearch($response['bill']['d']['ResultList'], fn ($e) => $e['energyType'] === 4);
+        $emptyBillingData = [
+            'price' => null,
+            'start' => null,
+            'current' => null,
+            'usage' => null,
+        ];
         $this->data['bill'] = [
-            'electricity' => [
+            'electricity' => $billElectricity ? [
                 'price' => $billElectricity['unitPrice'],
                 'start' => $billElectricity['energyCostDetails'][0]['billItemValues'][0]['preValue'],
                 'current' => $billElectricity['energyCostDetails'][0]['billItemValues'][0]['curValue'],
                 'usage' => $billElectricity['energyCostDetails'][0]['billItemValues'][0]['energyValue'],
-            ],
-            'coldWater' => [
+            ] : $emptyBillingData,
+            'coldWater' => $billColdWater ? [
                 'price' => $billColdWater['unitPrice'],
                 'start' => $billColdWater['energyCostDetails'][0]['billItemValues'][0]['preValue'],
                 'current' => $billColdWater['energyCostDetails'][0]['billItemValues'][0]['curValue'],
                 'usage' => $billColdWater['energyCostDetails'][0]['billItemValues'][0]['energyValue'],
-            ],
-            'hotWater' => [
+            ] : $emptyBillingData,
+            'hotWater' => $billHotWater ? [
                 'price' => $billHotWater['unitPrice'],
                 'start' => $billHotWater['energyCostDetails'][0]['billItemValues'][0]['preValue'],
                 'current' => $billHotWater['energyCostDetails'][0]['billItemValues'][0]['curValue'],
                 'usage' => $billHotWater['energyCostDetails'][0]['billItemValues'][0]['energyValue'],
-            ],
+            ] : $emptyBillingData,
         ];
     }
 
