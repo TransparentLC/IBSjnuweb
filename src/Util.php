@@ -5,7 +5,7 @@ namespace App;
 
 use \GuzzleHttp\Client;
 use \GuzzleHttp\Cookie\CookieJar;
-use \phpseclib\Crypt\AES;
+use \phpseclib3\Crypt\AES;
 
 class Util {
     static AES $aes;
@@ -117,6 +117,6 @@ class Util {
     }
 }
 
-Util::$aes = new AES(AES::MODE_CBC);
+Util::$aes = new AES('CBC');
 Util::$aes->setKey('CetSoftEEMSysWeb');
 Util::$aes->setIV("\x19\x34\x57\x72\x90\xAB\xCD\xEF\x12\x64\x14\x78\x90\xAC\xAE\x45");
