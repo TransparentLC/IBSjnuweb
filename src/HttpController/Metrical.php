@@ -14,6 +14,22 @@ class Metrical extends \App\Component\HttpController {
             $client = Util::getIBSClient();
             $userID = Util::doIBSLogin($client, $room);
 
+            $response = json_decode($client->post('GetBillCost', [
+                'headers' => Util::getIBSRequestHeader($userID),
+                'body' => '{"energyType":0,"startDate":"1000-01-01","endDate":"9999-12-31"}',
+            ])->getBody()->getContents(), true);
+            $billElectricity = Util::arraySearch($response['d']['ResultList'], fn ($e) => $e['energyType'] === 2);
+            $billColdWater = Util::arraySearch($response['d']['ResultList'], fn ($e) => $e['energyType'] === 3);
+            $billHotWater = Util::arraySearch($response['d']['ResultList'], fn ($e) => $e['energyType'] === 4);
+            $emptyPrice = [
+                'unitPrice' => 0,
+            ];
+            $price = [
+                'electricity' => ($billElectricity ?? $emptyPrice)['unitPrice'],
+                'coldWater' => ($billColdWater ?? $emptyPrice)['unitPrice'],
+                'hotWater' => ($billHotWater ?? $emptyPrice)['unitPrice'],
+            ];
+
             $year = (int)$this->args['year'];
             $month = isset($this->args['month']) ? (int)$this->args['month'] : 0;
 
@@ -54,6 +70,9 @@ class Metrical extends \App\Component\HttpController {
                 list($index, $key) = $item;
                 $data = Util::arraySearch($response['d']['ResultList'], fn ($e) => $e['energyType'] === $index);
                 $metricalData[$key] = $data ? array_map($func0, $data['datas']) : [];
+                foreach ($metricalData[$key] as &$d) {
+                    $d['cost'] = $d['usage'] * $price[$key];
+                }
             }
             foreach ($metricalData as &$md) {
                 usort($md, fn ($a, $b) => $a['time'] <=> $b['time']);
@@ -62,8 +81,10 @@ class Metrical extends \App\Component\HttpController {
             $func1 = fn ($e) => [
                 date($month ? 'Y-m-d' : 'Y-m', $e['time']),
                 (string)$e['usage'],
+                (string)round($e['cost'], 2),
             ];
             $func2 = fn ($acc, $cur) => $acc += $cur['usage'];
+            $func3 = fn ($acc, $cur) => $acc += $cur['cost'];
 
             switch ($_GET['format'] ?? null) {
                 case 'text':
@@ -97,24 +118,36 @@ AKARIN;
                         $room,
                         $month ? "{$year} 年 {$month} 月" : "{$year} 年",
                         Util::markdownTable(
-                            ['日期', '使用量'],
+                            ['日期', '使用量', '费用（不计补贴）'],
                             [
                                 ...array_map($func1, $metricalData['electricity']),
-                                ['总计', (string)array_reduce($metricalData['electricity'], $func2, 0)],
+                                [
+                                    '总计',
+                                    (string)array_reduce($metricalData['electricity'], $func2, 0),
+                                    (string)round(array_reduce($metricalData['electricity'], $func3, 0), 2),
+                                ],
                             ]
                         ),
                         Util::markdownTable(
-                            ['日期', '使用量'],
+                            ['日期', '使用量', '费用（不计补贴）'],
                             [
                                 ...array_map($func1, $metricalData['coldWater']),
-                                ['总计', (string)array_reduce($metricalData['coldWater'], $func2, 0)],
+                                [
+                                    '总计',
+                                    (string)array_reduce($metricalData['coldWater'], $func2, 0),
+                                    (string)round(array_reduce($metricalData['coldWater'], $func3, 0), 2),
+                                ],
                             ]
                         ),
                         Util::markdownTable(
-                            ['日期', '使用量'],
+                            ['日期', '使用量', '费用（不计补贴）'],
                             [
                                 ...array_map($func1, $metricalData['hotWater']),
-                                ['总计', (string)array_reduce($metricalData['hotWater'], $func2, 0)],
+                                [
+                                    '总计',
+                                    (string)array_reduce($metricalData['hotWater'], $func2, 0),
+                                    (string)round(array_reduce($metricalData['hotWater'], $func3, 0), 2),
+                                ],
                             ]
                         ),
                         date('Y-m-d H:i:s')
@@ -141,24 +174,36 @@ AKARIN;
                         $room,
                         $month ? "{$year} 年 {$month} 月" : "{$year} 年",
                         Util::htmlTable(
-                            ['日期', '使用量'],
+                            ['日期', '使用量', '费用（不计补贴）'],
                             [
                                 ...array_map($func1, $metricalData['electricity']),
-                                ['总计', (string)array_reduce($metricalData['electricity'], $func2, 0)],
+                                [
+                                    '总计',
+                                    (string)array_reduce($metricalData['electricity'], $func2, 0),
+                                    (string)round(array_reduce($metricalData['electricity'], $func3, 0), 2),
+                                ],
                             ]
                         ),
                         Util::htmlTable(
-                            ['日期', '使用量'],
+                            ['日期', '使用量', '费用（不计补贴）'],
                             [
                                 ...array_map($func1, $metricalData['coldWater']),
-                                ['总计', (string)array_reduce($metricalData['coldWater'], $func2, 0)],
+                                [
+                                    '总计',
+                                    (string)array_reduce($metricalData['coldWater'], $func2, 0),
+                                    (string)round(array_reduce($metricalData['coldWater'], $func3, 0), 2),
+                                ],
                             ]
                         ),
                         Util::htmlTable(
-                            ['日期', '使用量'],
+                            ['日期', '使用量', '费用（不计补贴）'],
                             [
                                 ...array_map($func1, $metricalData['hotWater']),
-                                ['总计', (string)array_reduce($metricalData['hotWater'], $func2, 0)],
+                                [
+                                    '总计',
+                                    (string)array_reduce($metricalData['hotWater'], $func2, 0),
+                                    (string)round(array_reduce($metricalData['hotWater'], $func3, 0), 2),
+                                ],
                             ]
                         ),
                         date('Y-m-d H:i:s')

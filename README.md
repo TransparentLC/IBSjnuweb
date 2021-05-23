@@ -16,6 +16,8 @@
 
 具体使用方式请参见 `public/index.md`。
 
+本项目[以 GNU AGPL 3.0 协议开源](https://github.com/TransparentLC/IBSjnuweb/blob/master/LICENSE)，如果你的项目（包括但不限于用于商业用途、公众号、小程序等）依赖本 API 的代码并对他人提供服务，则整个项目也必须以该协议开源。
+
 # 部署
 
 **部署的设备必须可以正常连接番禺校区的校园网，否则无法使用 API。**

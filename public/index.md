@@ -22,7 +22,7 @@
 >   </select>
 > </div>
 > <div>
->   点击这里查看结果 -> <a id="api-url" target="_blank" rel="noopener noreferrer"></a>
+>   点击这里查看结果 -> <a id="query" target="_blank" rel="noopener noreferrer"></a>
 > </div>
 
 # 注意事项
@@ -138,17 +138,18 @@
   "result": {
     // time  时间戳，一般是一年中每个月的第一天（按年份查询）/一个月中每一天（按月份查询）的零点
     // usage 使用量
+    // cost  费用，由使用量与单价直接相乘而得到，因此不计算补贴相关，这个值不会在图表中显示
     "electricity": [
-      { "time": 1606752000, "usage": 3.24 },
-      { "time": 1606838400, "usage": 3.63 }
+      { "time": 1606752000, "usage": 3.24, "cost": 2.03 },
+      { "time": 1606838400, "usage": 3.63, "cost": 2.27 }
     ],
     "coldWater": [
-      { "time": 1606752000, "usage": 0 },
-      { "time": 1606838400, "usage": 0 }
+      { "time": 1606752000, "usage": 0, "cost": 0 },
+      { "time": 1606838400, "usage": 0, "cost": 0 }
     ],
     "hotWater": [
-      { "time": 1606752000, "usage": 0.2 },
-      { "time": 1606838400, "usage": 0.1 }
+      { "time": 1606752000, "usage": 0.2, "cost": 5 },
+      { "time": 1606838400, "usage": 0.1, "cost": 2.5 }
     ]
   }
 }
