@@ -238,7 +238,7 @@ AKARIN;
                                                 'day' => 'YYYY-MM-DD',
                                                 'month' => 'YYYY-MM',
                                             ],
-                                            'unit' => $month ? 'day' : 'month'
+                                            'unit' => $month ? 'day' : 'month',
                                         ],
                                     ],
                                 ],
@@ -248,7 +248,7 @@ AKARIN;
                                         'position' => 'left',
                                         'scaleLabel' => [
                                             'display' => true,
-                                            'labelString' => '电能（度）'
+                                            'labelString' => '电能（度）',
                                         ],
                                         'ticks' => [
                                             'min' => 0,
@@ -259,7 +259,7 @@ AKARIN;
                                         'position' => 'right',
                                         'scaleLabel' => [
                                             'display' => true,
-                                            'labelString' => '用水量（吨）'
+                                            'labelString' => '用水量（吨）',
                                         ],
                                         'ticks' => [
                                             'min' => 0,
@@ -336,6 +336,12 @@ AKARIN;
                     $this->writeJson(200, $metricalData, "{$room} 查询成功");
                     break;
             }
+
+            try {
+                $r = Util::getRedisClient();
+                $r->hIncrBy('IBSjnuweb:Statistics:' . date('YmdH'), 'metrical', 1);
+                $r->expire('IBSjnuweb:Statistics:' . date('YmdH'), 604800);
+            } catch (\Throwable $th) {}
         } catch (\Throwable $th) {
             switch ($_GET['format'] ?? null) {
                 case 'text':

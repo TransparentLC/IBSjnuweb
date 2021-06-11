@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\HttpController;
 
 use \App\RecordData;
+use \App\Util;
 
 class Record extends \App\Component\HttpController {
     function index() {
@@ -32,6 +33,12 @@ class Record extends \App\Component\HttpController {
                     $this->writeJson(200, $record->toArray(), "{$room} 查询成功");
                     break;
             }
+
+            try {
+                $r = Util::getRedisClient();
+                $r->hIncrBy('IBSjnuweb:Statistics:' . date('YmdH'), 'payment', 1);
+                $r->expire('IBSjnuweb:Statistics:' . date('YmdH'), 604800);
+            } catch (\Throwable $th) {}
         } catch (\Throwable $th) {
             switch ($_GET['format'] ?? null) {
                 case 'text':

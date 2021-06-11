@@ -50,3 +50,36 @@ location ~ \/IBSjnuweb\/(.*)$ {
 下载源代码后，在终端中执行 `php -S 0.0.0.0:5000 main.php`，API 就会运行在本机的 5000 端口（也可以修改为其它端口）。
 
 Windows 用户可以直接双击 `run-dev-server.bat`。
+
+# 请求次数统计
+
+自带了一个简单的请求次数统计功能，会以小时为单位记录最近一周各功能的请求次数，并以图表的形式展示。
+
+访问 `/api/statistics` 即可获取统计信息：
+
+```json
+{
+  "code": 200,
+  "msg": "",
+  "result": {
+    "chart": "https://quickchart.io/chart/render/********",
+    "statistics": [
+      {
+        "time": 1623402000,
+        "billing": 3,
+        "payment": 1,
+        "metrical": 2
+      },
+      {
+        "time": 1623405600,
+        "billing": 1,
+        "payment": 3,
+        "metrical": 0
+      },
+      ...
+    ]
+  }
+}
+```
+
+要启用该功能，你需要一个可用的 Redis 服务端，并在 PHP 环境中安装好 [Redis 扩展](https://github.com/phpredis/phpredis)，然后在 PHAR 文件或 `index.php` 的同一目录下新建文件 `redis.config`，写入 `<host>:<port>:<password>` 设定连接参数（后两者可以留空），例如 `127.0.0.1:6379:p@S$w0Rd` 或 `localhost::`。

@@ -481,3 +481,5 @@ IBSjnuweb.*.phar
 
 public/app.min.js
 public/index.min.html
+
+redis.config

@@ -3,8 +3,10 @@ declare(strict_types=1);
 
 namespace App;
 
+use \Exception;
 use \GuzzleHttp\Client;
 use \GuzzleHttp\Cookie\CookieJar;
+use \Redis;
 use \phpseclib3\Crypt\AES;
 
 class Util {
@@ -114,6 +116,27 @@ class Util {
             }
         }
         return null;
+    }
+
+    static function getRedisClient(): Redis {
+        if (!extension_loaded('redis')) {
+            throw new Exception('Redis extension is required');
+        }
+        if (!is_file(PHAR_PATH . '/redis.config')) {
+            throw new Exception('Redis config file (' . PHAR_PATH . '/redis.config) is not found');
+        }
+
+        list($host, $port, $auth) = explode(':', file_get_contents(PHAR_PATH . '/redis.config'));
+        $r = new Redis;
+        if (substr($host, -strlen('.sock')) || empty($port)) {
+            $r->pconnect($host);
+        } else {
+            $r->pconnect($host, $port);
+        }
+        if (!empty($auth)) {
+            $r->auth($auth);
+        }
+        return $r;
     }
 }
 
