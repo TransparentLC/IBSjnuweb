@@ -128,7 +128,7 @@ class Util {
 
         list($host, $port, $auth) = explode(':', file_get_contents(PHAR_PATH . '/redis.config'));
         $r = new Redis;
-        if (substr($host, -strlen('.sock')) || empty($port)) {
+        if (substr($host, -strlen('.sock')) === '.sock' || empty($port)) {
             $r->pconnect($host);
         } else {
             $r->pconnect($host, $port);
