@@ -145,7 +145,7 @@ class Statistics extends \App\Component\HttpController {
             $chartUrl = json_decode($chartUrl, true)['url'];
             $r->set("IBSjnuweb:ChartUrl:{$chartDataHash}", $chartUrl);
         }
-        $r->expire("IBSjnuweb:ChartUrl:{$chartDataHash}", 300);
+        $r->expire("IBSjnuweb:ChartUrl:{$chartDataHash}", 3600);
 
         $this->writeJson(200, [
             'chart' => $chartUrl,
