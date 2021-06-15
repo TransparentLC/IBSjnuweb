@@ -22,9 +22,10 @@ class Statistics extends \App\Component\HttpController {
         do {
             $k = $r->scan($scanIter, 'IBSjnuweb:Statistics:*');
             if (is_array($k)) {
-                $keys += $k;
+                $keys = array_merge($keys, $k);
             }
         } while ($k);
+
         $statistics = array_map(function (string $e) use ($r) {
             $s = [
                 'time' => (int)DateTime::createFromFormat('YmdH', explode(':', $e)[2])->format('U'),
@@ -122,22 +123,29 @@ class Statistics extends \App\Component\HttpController {
                 ],
             ],
         ];
-        $chartUrl = (new Client)
-            ->post(
-                'https://quickchart.io/chart/create',
-                [
-                    'json' => [
-                        'width' => 1080,
-                        'height' => 480,
-                        'format' => (strpos($_SERVER['HTTP_ACCEPT'], 'image/webp') !== false) ? 'webp' : 'png',
-                        'backgroundColor' => '#fff',
-                        'chart' => $chartData,
-                    ],
-                ]
-            )
-            ->getBody()
-            ->getContents();
-        $chartUrl = json_decode($chartUrl, true)['url'];
+
+        $chartDataHash = hash('sha256', json_encode($chartData, JSON_UNESCAPED_UNICODE_SLASHES));
+        $chartUrl = $r->get("IBSjnuweb:ChartUrl:{$chartDataHash}");
+        if (!$chartUrl) {
+            $chartUrl = (new Client)
+                ->post(
+                    'https://quickchart.io/chart/create',
+                    [
+                        'json' => [
+                            'width' => 1080,
+                            'height' => 480,
+                            'format' => (strpos($_SERVER['HTTP_ACCEPT'], 'image/webp') !== false) ? 'webp' : 'png',
+                            'backgroundColor' => '#fff',
+                            'chart' => $chartData,
+                        ],
+                    ]
+                )
+                ->getBody()
+                ->getContents();
+            $chartUrl = json_decode($chartUrl, true)['url'];
+            $r->set("IBSjnuweb:ChartUrl:{$chartDataHash}", $chartUrl);
+        }
+        $r->expire("IBSjnuweb:ChartUrl:{$chartDataHash}", 300);
 
         $this->writeJson(200, [
             'chart' => $chartUrl,
