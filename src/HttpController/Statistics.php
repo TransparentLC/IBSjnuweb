@@ -124,9 +124,9 @@ class Statistics extends \App\Component\HttpController {
             ],
         ];
 
-        $chartDataHash = hash('sha256', json_encode($chartData, JSON_UNESCAPED_UNICODE_SLASHES));
-        $chartUrl = $r->get("IBSjnuweb:ChartUrl:{$chartDataHash}");
-        if (!$chartUrl) {
+        $chartDataHash = hash('sha256', json_encode($chartData, JSON_UNESCAPED_UNICODE_SLASHES), true);
+        $chartUrlCache = $r->get('IBSjnuweb:ChartUrlCache');
+        if ($chartUrlCache === false || substr($chartUrlCache, 0, strlen($chartDataHash)) !== $chartDataHash) {
             $chartUrl = (new Client)
                 ->post(
                     'https://quickchart.io/chart/create',
@@ -134,7 +134,7 @@ class Statistics extends \App\Component\HttpController {
                         'json' => [
                             'width' => 1080,
                             'height' => 480,
-                            'format' => (strpos($_SERVER['HTTP_ACCEPT'], 'image/webp') !== false) ? 'webp' : 'png',
+                            'format' => 'png',
                             'backgroundColor' => '#fff',
                             'chart' => $chartData,
                         ],
@@ -143,9 +143,10 @@ class Statistics extends \App\Component\HttpController {
                 ->getBody()
                 ->getContents();
             $chartUrl = json_decode($chartUrl, true)['url'];
-            $r->set("IBSjnuweb:ChartUrl:{$chartDataHash}", $chartUrl);
+            $r->set('IBSjnuweb:ChartUrlCache', $chartDataHash . $chartUrl, 3600);
+        } else {
+            $chartUrl = substr($chartUrlCache, strlen($chartDataHash));
         }
-        $r->expire("IBSjnuweb:ChartUrl:{$chartDataHash}", 3600);
 
         $this->writeJson(200, [
             'chart' => $chartUrl,
