@@ -14,7 +14,7 @@ class Util {
 
     static function getIBSClient(): Client {
         $client = new Client([
-            'base_uri' => 'http://10.136.2.5/IBSjnuweb/WebService/JNUService.asmx/',
+            'base_uri' => 'https://pynhcx.jnu.edu.cn/ibsjnuweb/WebService/JNUService.asmx/',
             'cookies' => new CookieJar,
             'headers' => [
                 'Content-Type' => 'application/json;charset=utf-8',

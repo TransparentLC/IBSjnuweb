@@ -134,7 +134,7 @@ class Statistics extends \App\Component\HttpController {
                         'json' => [
                             'width' => 1080,
                             'height' => 480,
-                            'format' => 'png',
+                            'format' => (strpos($_SERVER['HTTP_ACCEPT'], 'image/webp') !== false) ? 'webp' : 'png',
                             'backgroundColor' => '#fff',
                             'chart' => $chartData,
                         ],
