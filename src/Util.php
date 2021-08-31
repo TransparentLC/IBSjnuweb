@@ -6,58 +6,95 @@ namespace App;
 use \Exception;
 use \GuzzleHttp\Client;
 use \GuzzleHttp\Cookie\CookieJar;
+use \GuzzleHttp\Cookie\SetCookie;
+use \GuzzleHttp\Handler\CurlMultiHandler;
+use \GuzzleHttp\HandlerStack;
+use \GuzzleHttp\Middleware;
 use \Redis;
+use \Psr\Http\Message\RequestInterface;
 use \phpseclib3\Crypt\AES;
 
 class Util {
     static AES $aes;
 
-    static function getIBSClient(): Client {
+    static function getIBSClient(string $room): Client {
+        $cookieJar = new CookieJar;
+        $handlerStack = HandlerStack::create(new CurlMultiHandler);
         $client = new Client([
             'base_uri' => 'https://pynhcx.jnu.edu.cn/ibsjnuweb/WebService/JNUService.asmx/',
-            'cookies' => new CookieJar,
             'headers' => [
                 'Content-Type' => 'application/json',
-                'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; rv:11.0) like Gecko',
-                'X-Forwarded-For' => '127.0.0.1',
             ],
+            'cookies' => $cookieJar,
+            'handler' => $handlerStack,
         ]);
-        return $client;
-    }
 
-    static function getIBSRequestHeader(int $userID): array {
-        $timestamp = time();
-        $datetime = date('Y-m-d H:i:s', $timestamp);
-        $token = base64_encode(
-            self::$aes->encrypt(
-                json_encode([
-                    'userID' => $userID,
-                    'tokenTime' => $datetime,
-                ])
-            )
-        );
-        return [
-            'Token' => $token,
-            'DateTime' => $datetime,
-        ];
-    }
 
-    static function doIBSLogin(Client $client, string $user): int {
-        $loginResponse = json_decode(
-            $client->post('Login', [
-                'body' => json_encode([
-                    'user' => $user,
-                    'password' => base64_encode(static::$aes->encrypt($user)),
-                ], JSON_UNESCAPED_UNICODE_SLASHES),
-            ])->getBody()->getContents(),
-            true
-        );
+        $room = strtoupper($room);
+        /** @var string */
+        $cookieSessionID = null;
+        /** @var int */
+        $userID = null;
+        /** @var Redis */
+        $r = null;
+        try {
+            $r = static::getRedisClient();
+            $sessionCache = $r->get('IBSjnuweb:RoomSessionCache:' . $room);
+            if ($sessionCache) {
+                list($cookieSessionID, $userID) = explode(':', $sessionCache);
+                $userID = (int)$userID;
+            };
+        } catch (\Throwable $th) {}
 
-        if (!$loginResponse['d']['Success']) {
-            throw new \Exception('Invalid user');
+        if ($cookieSessionID && $userID) {
+            $sc = new SetCookie;
+            $sc->setName('ASP.NET_SessionId');
+            $sc->setValue($cookieSessionID);
+            $sc->setDomain('pynhcx.jnu.edu.cn');
+            $sc->setPath('/');
+            $cookieJar->setCookie($sc);
+        } else {
+            $loginResponse = json_decode(
+                $client->post('Login', [
+                    'body' => json_encode([
+                        'user' => $room,
+                        'password' => base64_encode(static::$aes->encrypt($room)),
+                    ], JSON_UNESCAPED_UNICODE_SLASHES),
+                ])->getBody()->getContents(),
+                true
+            );
+            if (!$loginResponse['d']['Success']) {
+                throw new \Exception('Invalid room');
+            }
+            $cookieSessionID = $cookieJar->getCookieByName('ASP.NET_SessionId')->getValue();
+            /** @var int */
+            $userID = $loginResponse['d']['ResultList'][0]['customerId'];
+
+            if ($r) {
+                $r->set(
+                    'IBSjnuweb:RoomSessionCache:' . $room,
+                    join(':', [$cookieSessionID, $userID]),
+                    1200
+                );
+            }
         }
 
-        return $loginResponse['d']['ResultList'][0]['customerId'];
+        $handlerStack->push(Middleware::mapRequest(function (RequestInterface $request) use ($userID) {
+            $timestamp = time();
+            $datetime = date('Y-m-d H:i:s', $timestamp);
+            $token = base64_encode(
+                self::$aes->encrypt(
+                    json_encode([
+                        'userID' => $userID,
+                        'tokenTime' => $datetime,
+                    ])
+                )
+            );
+            return $request
+                ->withHeader('Token', $token)
+                ->withHeader('DateTime', $datetime);
+        }));
+        return $client;
     }
 
     static function markdownTable(array $head, array $rows): string {

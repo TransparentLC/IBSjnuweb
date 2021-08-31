@@ -19,11 +19,9 @@ class RecordData {
         $this->page = (int)max(1, $page);
         $this->count = (int)min(100, $count);
 
-        $client = Util::getIBSClient();
-        $userID = Util::doIBSLogin($client, $this->room);
+        $client = Util::getIBSClient($this->room);
 
         $response = json_decode($client->post('GetPaymentRecord', [
-            'headers' => Util::getIBSRequestHeader($userID),
             'body' => json_encode([
                 'startIdx' => ($this->page - 1) * $this->count,
                 'recordCount' => $this->count,

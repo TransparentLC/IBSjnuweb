@@ -11,11 +11,9 @@ class Metrical extends \App\Component\HttpController {
         try {
             $room = strtoupper($this->args['room']);
 
-            $client = Util::getIBSClient();
-            $userID = Util::doIBSLogin($client, $room);
+            $client = Util::getIBSClient($room);
 
             $response = json_decode($client->post('GetBillCost', [
-                'headers' => Util::getIBSRequestHeader($userID),
                 'body' => '{"energyType":0,"startDate":"1000-01-01","endDate":"9999-12-31"}',
             ])->getBody()->getContents(), true);
             $billElectricity = Util::arraySearch($response['d']['ResultList'], fn ($e) => $e['energyType'] === 2);
@@ -44,7 +42,6 @@ class Metrical extends \App\Component\HttpController {
             }
 
             $response = json_decode($client->post('GetCustomerMetricalData', [
-                'headers' => Util::getIBSRequestHeader($userID),
                 'body' => json_encode([
                     'startDate' => $startDate,
                     'endDate' => $endDate,

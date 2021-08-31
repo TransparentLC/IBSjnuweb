@@ -13,19 +13,14 @@ class BillingData {
     public function __construct(string $room) {
         $this->room = strtoupper($room);
 
-        $client = Util::getIBSClient();
-        $userID = Util::doIBSLogin($client, $this->room);
+        $client = Util::getIBSClient($this->room);
 
         $response = Promise\Utils::unwrap([
-            'info' => $client->postAsync('GetUserInfo', [
-                'headers' => Util::getIBSRequestHeader($userID),
-            ]),
+            'info' => $client->postAsync('GetUserInfo'),
             'allowance' => $client->postAsync('GetSubsidy', [
-                'headers' => Util::getIBSRequestHeader($userID),
                 'body' => '{"startDate":"1000-01-01","endDate":"9999-12-31"}',
             ]),
             'bill' => $client->postAsync('GetBillCost', [
-                'headers' => Util::getIBSRequestHeader($userID),
                 'body' => '{"energyType":0,"startDate":"1000-01-01","endDate":"9999-12-31"}',
             ]),
         ]);
@@ -124,7 +119,7 @@ class BillingData {
         return [
             $this->room,
 
-            $this->data['balance'], ($this->data['balance'] < 30) ? '低于预警值 30 元，请及时充值！' : '',
+            $this->data['balance'], ($this->data['balance'] < 30) ? ' **低于预警值 30 元，请及时充值！**' : '',
 
             $this->data['allowance']['electricity']['available'], $this->data['allowance']['electricity']['total'],
             $this->data['allowance']['coldWater']['available'], $this->data['allowance']['coldWater']['total'],
@@ -154,7 +149,6 @@ class BillingData {
 
     public function toText(): string {
         $formatParam = $this->getFormatParamArray();
-        if (!empty($formatParam[2])) $formatParam[2] = " **{$formatParam[2]}**";
         $template = <<< 'AKARIN'
 %s 水电费数据
 ================================
