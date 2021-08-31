@@ -17,7 +17,7 @@ class Util {
             'base_uri' => 'https://pynhcx.jnu.edu.cn/ibsjnuweb/WebService/JNUService.asmx/',
             'cookies' => new CookieJar,
             'headers' => [
-                'Content-Type' => 'application/json;charset=utf-8',
+                'Content-Type' => 'application/json',
                 'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; rv:11.0) like Gecko',
                 'X-Forwarded-For' => '127.0.0.1',
             ],
@@ -25,20 +25,20 @@ class Util {
         return $client;
     }
 
-    static function generateIBSToken(int $userID): string {
-        $timestamp = time();
-        $arr = [
-            'userID' => $userID,
-            'tokenTime' => date('Y-m-d H:i:s', $timestamp),
-        ];
-        $encrypted = base64_encode(self::$aes->encrypt(json_encode($arr)));
-        return (strlen($encrypted) > 64) ? join('%0A', str_split($encrypted, 64)) : ($encrypted . '%0A');
-    }
-
     static function getIBSRequestHeader(int $userID): array {
+        $timestamp = time();
+        $datetime = date('Y-m-d H:i:s', $timestamp);
+        $token = base64_encode(
+            self::$aes->encrypt(
+                json_encode([
+                    'userID' => $userID,
+                    'tokenTime' => $datetime,
+                ])
+            )
+        );
         return [
-            'Token' => self::generateIBSToken($userID),
-            'DateTime' => date('Y-m-d H:i:s', time()),
+            'Token' => $token,
+            'DateTime' => $datetime,
         ];
     }
 
