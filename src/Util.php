@@ -175,6 +175,14 @@ class Util {
         }
         return $r;
     }
+
+    static function randomString(int $length, string $chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'): string {
+        $result = '';
+        for ($i = 0; $i < $length; $i++) {
+            $result .= $chars[mt_rand(0, strlen($chars) - 1)];
+        }
+        return $result;
+    }
 }
 
 Util::$aes = new AES('CBC');
