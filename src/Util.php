@@ -13,6 +13,7 @@ use \GuzzleHttp\Middleware;
 use \Redis;
 use \Psr\Http\Message\RequestInterface;
 use \phpseclib3\Crypt\AES;
+use function \AlecRabbit\Helpers\wcswidth;
 
 class Util {
     static AES $aes;
@@ -100,10 +101,7 @@ class Util {
     static function markdownTable(array $head, array $rows): string {
         $_rows = [$head, ...$rows];
         $rowLength = array_map(
-            fn ($e) => array_map(
-                fn ($t) => strlen(mb_convert_encoding($t, 'gbk', 'utf-8')),
-                $e
-            ),
+            fn ($e) => array_map(fn ($t) => wcswidth($t), $e),
             $_rows
         );
         $rowMaxLength = array_map(

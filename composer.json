@@ -1,5 +1,6 @@
 {
     "require": {
+        "alecrabbit/php-wcwidth": "^0.0",
         "guzzlehttp/guzzle": "^7.3",
         "phpseclib/phpseclib": "^3.0",
         "nikic/fast-route": "^1.3"
