@@ -17,6 +17,7 @@ use function \AlecRabbit\Helpers\wcswidth;
 
 class Util {
     static AES $aes;
+    static Array $config;
 
     static function getIBSClient(string $room): Client {
         $cookieJar = new CookieJar;
@@ -157,13 +158,17 @@ class Util {
         if (!extension_loaded('redis')) {
             throw new Exception('Redis extension is required');
         }
-        if (!is_file(PHAR_PATH . '/redis.config')) {
-            throw new Exception('Redis config file (' . PHAR_PATH . '/redis.config) is not found');
+        if (empty(self::$config['redis'])) {
+            throw new Exception('Redis-related config is missing in config file');
         }
 
-        list($host, $port, $auth) = explode(':', file_get_contents(PHAR_PATH . '/redis.config'));
+        $host = self::$config['redis']['host'];
+        $port = self::$config['redis']['port'];
+        $auth = self::$config['redis']['auth'];
+        $db = self::$config['redis']['db'];
+
         $r = new Redis;
-        if (substr($host, -strlen('.sock')) === '.sock' || empty($port)) {
+        if (substr($host, -strlen('.sock')) === '.sock') {
             $r->pconnect($host);
         } else {
             $r->pconnect($host, $port);
@@ -171,6 +176,7 @@ class Util {
         if (!empty($auth)) {
             $r->auth($auth);
         }
+        $r->select($db);
         return $r;
     }
 
@@ -181,8 +187,51 @@ class Util {
         }
         return $result;
     }
+
+    static function getIp(): string {
+        return empty($_SERVER['HTTP_X_REAL_IP']) ? $_SERVER['REMOTE_ADDR'] : $_SERVER['HTTP_X_REAL_IP'];
+    }
+
+    static function getRateLimitRemaining(Redis $r): int {
+        if (empty(self::$config['rateLimiting'])) return PHP_INT_MAX;
+        $ipKey = 'IBSjnuweb:RateLimiting:' . base64_encode(inet_pton(self::getIp()));
+
+        $remain = $r->get($ipKey);
+        if ($remain !== false) return (int)$remain;
+
+        $r->set($ipKey, self::$config['rateLimiting']['limit'], self::$config['rateLimiting']['window']);
+        return self::$config['rateLimiting']['limit'];
+    }
+
+    static function getRateLimitResetTime(Redis $r): int {
+        if (empty(self::$config['rateLimiting'])) return 0;
+        $ipKey = 'IBSjnuweb:RateLimiting:' . base64_encode(inet_pton(self::getIp()));
+
+        $expire = $r->ttl($ipKey);
+        if ($expire !== false) return time() + (int)$expire;
+
+        $r->set($ipKey, self::$config['rateLimiting']['limit'], self::$config['rateLimiting']['window']);
+        return time() + self::$config['rateLimiting']['window'];
+    }
+
+    static function decrRateLimit(Redis $r) {
+        if (empty(self::$config['rateLimiting'])) return;
+        $ipKey = 'IBSjnuweb:RateLimiting:' . base64_encode(inet_pton(self::getIp()));
+        $r->decr($ipKey);
+    }
+
+    static function setRateLimitHeaders(Redis $r) {
+        if (empty(self::$config['rateLimiting'])) return;
+
+        header('X-RateLimit-Limit:' . self::$config['rateLimiting']['limit']);
+        header('X-RateLimit-Window:' . self::$config['rateLimiting']['window']);
+        header('X-RateLimit-Remaining:' . self::getRateLimitRemaining($r));
+        header('X-RateLimit-Reset:' . self::getRateLimitResetTime($r));
+    }
 }
 
 Util::$aes = new AES('CBC');
 Util::$aes->setKey('CetSoftEEMSysWeb');
 Util::$aes->setIV("\x19\x34\x57\x72\x90\xAB\xCD\xEF\x12\x64\x14\x78\x90\xAC\xAE\x45");
+
+Util::$config = json_decode(file_get_contents(PHAR_PATH . '/config.json'), true);

@@ -1,0 +1,13 @@
+{
+    "$schema": "./config.schema.json",
+    "redis": {
+        "host": "localhost",
+        "port": 6379,
+        "auth": "p@S$w0rD",
+        "db": 0
+    },
+    "rateLimiting": {
+        "limit": 100,
+        "window": 3600
+    }
+}

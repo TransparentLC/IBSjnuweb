@@ -1,0 +1,84 @@
+{
+    "type": "object",
+    "properties": {
+        "redis": {
+            "anyOf": [
+                {
+                    "type": "null"
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "host": {
+                            "type": "string",
+                            "description": "Redis服务端的地址，也可以指向.sock结尾的Unix Socket文件路径。"
+                        },
+                        "port": {
+                            "type": "integer",
+                            "description": "Redis服务端的端口，使用Unix Socket时会被忽略。",
+                            "minimum": 0,
+                            "maximum": 65535,
+                            "format": "int32"
+                        },
+                        "auth": {
+                            "anyOf": [
+                                {
+                                    "type": "null"
+                                },
+                                {
+                                    "type": "string"
+                                }
+                            ],
+                            "description": "Redis服务端的密码，设为null或空字符串表示无密码。"
+                        },
+                        "db": {
+                            "type": "integer",
+                            "description": "Redis服务端使用的数据库索引。",
+                            "format": "int32"
+                        }
+                    },
+                    "required": [
+                        "host",
+                        "port",
+                        "auth",
+                        "db"
+                    ]
+                }
+            ],
+            "description": "Redis扩展相关配置，设为null表示不使用相关功能。"
+        },
+        "rateLimiting": {
+            "anyOf": [
+                {
+                    "type": "null"
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "limit": {
+                            "type": "integer",
+                            "description": "单个IP的请求次数限制，每次请求无论成功还是失败都会扣减，扣减到0以后将直接返回状态码429。",
+                            "minimum": 1,
+                            "format": "int32"
+                        },
+                        "window": {
+                            "type": "integer",
+                            "description": "请求次数重设时间，从第一个请求开始计时，经过这一时间后才会重设请求次数计数。",
+                            "minimum": 1,
+                            "format": "int32"
+                        }
+                    },
+                    "required": [
+                        "limit",
+                        "resetAfter"
+                    ]
+                }
+            ],
+            "description": "请求次数限制相关配置，需要配置Redis，设为null表示不限制。"
+        }
+    },
+    "required": [
+        "redis",
+        "rateLimiting"
+    ]
+}

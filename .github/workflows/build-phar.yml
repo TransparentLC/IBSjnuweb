@@ -50,6 +50,8 @@ jobs:
           path: |
             IBSjnuweb.phar
             index.php
+            config.example.json
+            config.schema.json
             public/app.js
             public/index.html
         if: ${{ always() }}

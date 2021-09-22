@@ -22,9 +22,10 @@
 
 **部署的设备必须可以正常连接番禺校区的校园网，否则无法使用 API。**
 
-1. 配置好 PHP 和 Nginx 环境
-2. 从[这里](https://nightly.link/TransparentLC/IBSjnuweb/workflows/build-phar/master/IBSjnuweb)下载打包好的 PHAR 文件和其他静态文件到网站目录，这里假设解压后保存在 `IBSjnuweb-source` 文件夹
-3. 假设需要将 API 部署在 `https://example.com/IBSjnuweb/`，添加以下 Nginx 配置：
+1. 配置好 PHP（建议使用 7.4 或更新版本）和 Nginx 环境。
+2. 从[这里](https://nightly.link/TransparentLC/IBSjnuweb/workflows/build-phar/master/IBSjnuweb)下载打包好的 PHAR 文件和其他静态文件到网站目录，这里假设解压后保存在 `IBSjnuweb-source` 文件夹。
+3. 在网站目录下创建配置文件 `config.json`，可以基于 `config.example.json` 的内容进行修改。`config.schema.json` 是配置文件的 JSON Schema。
+4. 假设需要将 API 部署在 `https://example.com/IBSjnuweb/`，添加以下 Nginx 配置：
 
 ```nginx
 location = /IBSjnuweb-source {
@@ -53,7 +54,7 @@ Windows 用户可以直接双击 `run-dev-server.bat`。
 
 # 请求次数统计
 
-自带了一个简单的请求次数统计功能，会以小时为单位记录最近一周各功能的请求次数，并以图表的形式展示。
+自带了一个简单的请求次数统计功能，会以小时为单位记录最近一周各功能的请求次数，并以图表的形式展示。此功能在正确配置 Redis 后自动开启。
 
 访问 `/api/statistics` 即可获取统计信息：
 
@@ -82,4 +83,13 @@ Windows 用户可以直接双击 `run-dev-server.bat`。
 }
 ```
 
-要启用该功能，你需要一个可用的 Redis 服务端，并在 PHP 环境中安装好 [Redis 扩展](https://github.com/phpredis/phpredis)，然后在 PHAR 文件或 `index.php` 的同一目录下新建文件 `redis.config`，写入 `<host>:<port>:<password>` 设定连接参数（后两者可以留空），例如 `127.0.0.1:6379:p@S$w0Rd` 或 `localhost::`。
+# 请求次数限制
+
+自带了一个简单的请求次数限制功能，可以以 IP 为单位对一段时间内的请求次数进行限制，超过限制后将返回 HTTP 状态码 429 Too Many Requests。可以在配置文件中配置限制时间及请求次数上限。
+
+开启此功能后，查询时会增加以下响应头：
+
+* `X-RateLimit-Limit` 目前配置的请求次数限制。
+* `X-RateLimit-Window` 目前配置的时间窗口。从第一次请求开始计时，经过这一时间后才会重设请求次数。
+* `X-RateLimit-Remaining` 剩余的请求次数。
+* `X-RateLimit-Reset` 下次重设请求次数的时间戳。
