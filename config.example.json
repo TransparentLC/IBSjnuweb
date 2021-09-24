@@ -8,6 +8,18 @@
     },
     "rateLimiting": {
         "limit": 100,
-        "window": 3600
+        "window": 3600,
+        "extra": [
+            {
+                "ip": "::1",
+                "limit": 1000,
+                "window": 600
+            },
+            {
+                "ip": "192.168.1.1",
+                "limit": 20,
+                "window": 3600
+            }
+        ]
     }
 }

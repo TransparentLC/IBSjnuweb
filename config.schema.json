@@ -66,11 +66,48 @@
                             "description": "请求次数重设时间，从第一个请求开始计时，经过这一时间后才会重设请求次数计数。",
                             "minimum": 1,
                             "format": "int32"
+                        },
+                        "extra": {
+                            "type": "array",
+                            "description": "针对特定的IP单独配置次数限制。",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "ip": {
+                                        "anyOf": [
+                                            {
+                                                "type": "string",
+                                                "format": "ipv4"
+                                            },
+                                            {
+                                                "type": "string",
+                                                "format": "ipv6"
+                                            }
+                                        ]
+                                    },
+                                    "limit": {
+                                        "type": "integer",
+                                        "minimum": 1,
+                                        "format": "int32"
+                                    },
+                                    "window": {
+                                        "type": "integer",
+                                        "minimum": 1,
+                                        "format": "int32"
+                                    }
+                                },
+                                "required": [
+                                    "ip",
+                                    "limit",
+                                    "window"
+                                ]
+                            }
                         }
                     },
                     "required": [
                         "limit",
-                        "resetAfter"
+                        "window",
+                        "extra"
                     ]
                 }
             ],
