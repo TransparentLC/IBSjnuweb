@@ -61,7 +61,7 @@ class Statistics extends \App\Component\HttpController {
             }
         }
         usort($statistics, fn ($a, $b) => $a['time'] <=> $b['time']);
-        // array_pop($statistics);
+        array_pop($statistics);
 
         $chartData = [
             'type' => 'line',
