@@ -61,6 +61,7 @@ class Statistics extends \App\Component\HttpController {
             }
         }
         usort($statistics, fn ($a, $b) => $a['time'] <=> $b['time']);
+        // array_pop($statistics);
 
         $chartData = [
             'type' => 'line',
@@ -127,32 +128,15 @@ class Statistics extends \App\Component\HttpController {
         $chartDataHash = hash('sha256', json_encode($chartData, JSON_UNESCAPED_UNICODE_SLASHES), true);
         $chartUrlCache = $r->get('IBSjnuweb:ChartUrlCache');
         if ($chartUrlCache === false || substr($chartUrlCache, 0, strlen($chartDataHash)) !== $chartDataHash) {
-            // $chartUrl = (new Client)
-            //     ->post(
-            //         'https://quickchart.io/chart/create',
-            //         [
-            //             'json' => [
-            //                 'width' => 1080,
-            //                 'height' => 480,
-            //                 'format' => (strpos($_SERVER['HTTP_ACCEPT'], 'image/webp') !== false) ? 'webp' : 'png',
-            //                 'backgroundColor' => '#fff',
-            //                 'chart' => $chartData,
-            //             ],
-            //         ]
-            //     )
-            //     ->getBody()
-            //     ->getContents();
-            // $chartUrl = json_decode($chartUrl, true)['url'];
-
-            $client = new Client;
-            $chartImage = $client
+            $chartUrl = (new Client)
                 ->post(
-                    'https://quickchart.io/chart',
+                    'https://quickchart.io/chart/create',
                     [
                         'json' => [
                             'width' => 1080,
                             'height' => 480,
-                            'format' => 'png',
+                            'format' => 'svg',
+                            'devicePixelRatio' => 1,
                             'backgroundColor' => '#fff',
                             'chart' => $chartData,
                         ],
@@ -160,46 +144,7 @@ class Statistics extends \App\Component\HttpController {
                 )
                 ->getBody()
                 ->getContents();
-            $chartCompressed = $client
-                ->post(
-                    'https://tinypng.com/web/shrink',
-                    [
-                        'body' => $chartImage,
-                    ]
-                )
-                ->getBody()
-                ->getContents();
-            $chartCompressed = json_decode($chartCompressed, true)['output']['url'];
-            $chartImage = $client->get($chartCompressed)->getBody()->getContents();
-            $chartUrl = $client
-                ->post(
-                    'https://yzf.qq.com/fsnb/kf-file/upload_wx_media',
-                    [
-                        'multipart' => [
-                            [
-                                'name' => 'mid',
-                                'contents' => 'fsnb',
-                            ],
-                            [
-                                'name' => 'media_type',
-                                'contents' => 'image',
-                            ],
-                            [
-                                'name' => 'userid',
-                                'contents' => 'kf' . Util::randomString(16) . '_' . Util::randomString(2),
-                            ],
-                            [
-                                'name' => 'file',
-                                'contents' => $chartImage,
-                                'filename' => Util::randomString(16) . '.png',
-                            ],
-                        ],
-                    ]
-                )
-                ->getBody()
-                ->getContents();
-            $chartUrl = preg_replace('/\?.*$/', '', urldecode(json_decode($chartUrl, true)['KfPicUrl']));
-
+            $chartUrl = json_decode($chartUrl, true)['url'];
             $r->set('IBSjnuweb:ChartUrlCache', $chartDataHash . $chartUrl, 3600);
         } else {
             $chartUrl = substr($chartUrlCache, strlen($chartDataHash));
