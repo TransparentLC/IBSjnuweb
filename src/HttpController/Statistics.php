@@ -128,15 +128,15 @@ class Statistics extends \App\Component\HttpController {
         $chartDataHash = hash('sha256', json_encode($chartData, JSON_UNESCAPED_UNICODE_SLASHES), true);
         $chartUrlCache = $r->get('IBSjnuweb:ChartUrlCache');
         if ($chartUrlCache === false || substr($chartUrlCache, 0, strlen($chartDataHash)) !== $chartDataHash) {
-            $chartUrl = (new Client)
+            $client = new Client;
+            $chartImage = $client
                 ->post(
-                    'https://quickchart.io/chart/create',
+                    'https://quickchart.io/chart',
                     [
                         'json' => [
                             'width' => 1080,
                             'height' => 480,
-                            'format' => 'svg',
-                            'devicePixelRatio' => 1,
+                            'format' => 'png',
                             'backgroundColor' => '#fff',
                             'chart' => $chartData,
                         ],
@@ -144,7 +144,46 @@ class Statistics extends \App\Component\HttpController {
                 )
                 ->getBody()
                 ->getContents();
-            $chartUrl = json_decode($chartUrl, true)['url'];
+            $chartCompressed = $client
+                ->post(
+                    'https://tinypng.com/web/shrink',
+                    [
+                        'body' => $chartImage,
+                    ]
+                )
+                ->getBody()
+                ->getContents();
+            $chartCompressed = json_decode($chartCompressed, true)['output']['url'];
+            $chartImage = $client->get($chartCompressed)->getBody()->getContents();
+            $chartUrl = $client
+                ->post(
+                    'https://yzf.qq.com/fsnb/kf-file/upload_wx_media',
+                    [
+                        'multipart' => [
+                            [
+                                'name' => 'mid',
+                                'contents' => 'fsnb',
+                            ],
+                            [
+                                'name' => 'media_type',
+                                'contents' => 'image',
+                            ],
+                            [
+                                'name' => 'userid',
+                                'contents' => 'kf' . Util::randomString(16) . '_' . Util::randomString(2),
+                            ],
+                            [
+                                'name' => 'file',
+                                'contents' => $chartImage,
+                                'filename' => Util::randomString(16) . '.png',
+                            ],
+                        ],
+                    ]
+                )
+                ->getBody()
+                ->getContents();
+            $chartUrl = preg_replace('/\?.*$/', '', urldecode(json_decode($chartUrl, true)['KfPicUrl']));
+
             $r->set('IBSjnuweb:ChartUrlCache', $chartDataHash . $chartUrl, 3600);
         } else {
             $chartUrl = substr($chartUrlCache, strlen($chartDataHash));
