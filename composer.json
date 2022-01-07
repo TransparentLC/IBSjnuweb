@@ -1,9 +1,9 @@
 {
     "require": {
         "alecrabbit/php-wcwidth": "^0.0",
-        "guzzlehttp/guzzle": "^7.3",
-        "phpseclib/phpseclib": "^3.0",
-        "nikic/fast-route": "^1.3"
+        "guzzlehttp/guzzle": "^7",
+        "phpseclib/phpseclib": "^3",
+        "nikic/fast-route": "^1"
     },
     "suggest": {
         "ext-redis": "Required to record number of recent api requests, cache sessions and enable rate-limiting"

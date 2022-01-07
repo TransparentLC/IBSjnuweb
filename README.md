@@ -12,7 +12,7 @@
 
 </div>
 
-水电费查询 API，番禺校区校园网内[“宿舍能耗查询系统”](https://pynhcx.jnu.edu.cn/ibsjnuweb)的二次封装，支持以 JSON / 纯文本（Markdown）/ HTML 格式输出数据。
+水电费查询 API，番禺校区校园网内[“宿舍能耗查询系统”](http://10.136.2.5/IBSjnuweb/)的二次封装，支持以 JSON / 纯文本（Markdown）/ HTML 格式输出数据。
 
 具体使用方式请参见 `public/index.md`。
 

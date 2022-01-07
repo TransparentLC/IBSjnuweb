@@ -23,7 +23,7 @@ class Util {
         $cookieJar = new CookieJar;
         $handlerStack = HandlerStack::create(new CurlMultiHandler);
         $client = new Client([
-            'base_uri' => 'https://pynhcx.jnu.edu.cn/ibsjnuweb/WebService/JNUService.asmx/',
+            'base_uri' => 'http://10.136.2.5/IBSjnuweb/WebService/JNUService.asmx/',
             'headers' => [
                 'Content-Type' => 'application/json',
             ],
