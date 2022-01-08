@@ -52,7 +52,7 @@ class Util {
             $sc = new SetCookie;
             $sc->setName('ASP.NET_SessionId');
             $sc->setValue($cookieSessionID);
-            $sc->setDomain('pynhcx.jnu.edu.cn');
+            $sc->setDomain('10.136.2.5');
             $sc->setPath('/');
             $cookieJar->setCookie($sc);
         } else {
