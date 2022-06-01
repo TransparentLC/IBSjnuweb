@@ -154,7 +154,7 @@ class Statistics extends \App\Component\HttpController {
                     )
                     ->getBody()
                     ->getContents();
-                $chartUrl = json_decode($chartCompressed, true)['resultUrl'];
+                $chartUrl = 'data:image/svg+xml;utf8,' . rawurlencode($client->get(json_decode($chartCompressed, true)['resultUrl'])->getBody()->getContents());
             } else {
                 $chartCompressed = $client
                     ->post(
