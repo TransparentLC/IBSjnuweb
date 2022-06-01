@@ -112,10 +112,16 @@
                 }
             ],
             "description": "请求次数限制相关配置，需要配置Redis，设为null表示不限制。"
+        },
+        "svgChart": {
+            "type": "boolean",
+            "description": "使用SVG格式生成统计信息中的请求次数图表。",
+            "default": true
         }
     },
     "required": [
         "redis",
-        "rateLimiting"
+        "rateLimiting",
+        "svgChart"
     ]
 }
